@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product Authenticity Checker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 400px;
+    }
+    h1 {
+      text-align: center;
+      color: #2b7a78;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 0.8rem;
+      margin: 1rem 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      background: #2b7a78;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 1rem;
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Check Product Authenticity</h1>
+    <input type="text" id="productCode" placeholder="Enter or Scan Product Code" />
+    <button onclick="checkCode()">Verify</button>
+    <div id="result"></div>
+  </div>
+  
+  <script>
+  const apiUrl = "https://script.google.com/macros/s/AKfycbw8NZ3jQF_94zffSszG6x8I2Vx2dBfK4TAfFTg5x3quVHm9c1ICho96G4zOklAJaUo6/exec"; // Replace with your Apps Script Web App URL
+
+  async function checkCode() {
+    const code = document.getElementById("productCode").value.trim().toUpperCase();
+    const resultDiv = document.getElementById("result");
+
+    if (code === "") {
+      resultDiv.innerHTML = "Please enter a product code.";
+      resultDiv.style.color = "#cc0000";
+      return;
+    }
+
+    try {
+      const response = await fetch(`${apiUrl}?code=${code}`);
+      const data = await response.json();
+
+      if (data.valid) {
+        resultDiv.innerHTML = `✅ Authentic: ${data.product}<br>Status: ${data.status}`;
+        resultDiv.style.color = "green";
+      } else {
+        resultDiv.innerHTML = "❌ Invalid or counterfeit product code.";
+        resultDiv.style.color = "red";
+      }
+    } catch (err) {
+      resultDiv.innerHTML = "Error connecting to validation server.";
+      resultDiv.style.color = "orange";
+    }
+  }
+</script>
+
+
+<!--  <script>
+    // Example: A local list of valid codes (replace with backend call in production)
+    const validCodes = {
+      "AXD1034Z": "Organic Tea Pack",
+      "BQT9472P": "Smart USB Cable",
+      "CXZ5981M": "Herbal Oil",
+      "DKP3021L": "Fitness Tracker",
+      "EQW7810K": "Bluetooth Speaker",
+      "FTR4417J": "Protein Bar Pack",
+      "GPZ1509Y": "Thermal Flask",
+      "HLU9804V": "Laptop Stand",
+      "IRK7632N": "LED Ring Light",
+      "JMX4827S": "Beard Trimmer"
+    };
+
+    function checkCode() {
+      const code = document.getElementById("productCode").value.trim().toUpperCase();
+      const resultDiv = document.getElementById("result");
+
+      if (code === "") {
+        resultDiv.innerHTML = "Please enter a product code.";
+        resultDiv.style.color = "#cc0000";
+        return;
+      }
+
+      if (validCodes[code]) {
+        resultDiv.innerHTML = `✅ Authentic: ${validCodes[code]}`;
+        resultDiv.style.color = "green";
+      } else {
+        resultDiv.innerHTML = "❌ Invalid or counterfeit product code.";
+        resultDiv.style.color = "red";
+      }
+    }
+  </script>-->
+</body>
+</html>
