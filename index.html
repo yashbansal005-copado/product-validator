@@ -1,98 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Product Authenticity Checker</title>
+  <meta charset="UTF-8">
+  <title>Product Code Validator</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f7f9fc;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
+      padding: 2rem;
+      background: #f0f0f0;
     }
     .container {
       background: white;
       padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      width: 90%;
       max-width: 400px;
-    }
-    h2 {
-      color: #2b7a78;
-      text-align: center;
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 0.75rem;
-      margin-top: 1rem;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-    button {
-      margin-top: 1rem;
-      width: 100%;
-      padding: 0.75rem;
-      background-color: #2b7a78;
-      color: white;
-      font-size: 1rem;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
+      margin: auto;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     #result {
-      margin-top: 1.5rem;
-      font-size: 1rem;
+      margin-top: 1rem;
       font-weight: bold;
-      text-align: center;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>Check Product Authenticity</h2>
-    <input type="text" id="productCode" placeholder="Enter or scan product code" />
-    <button onclick="checkCode()">Verify</button>
+    <input type="text" id="codeInput" placeholder="Enter product code" />
+    <button onclick="validateCode()">Validate</button>
     <div id="result"></div>
   </div>
 
   <script>
-    const apiUrl = "https://script.google.com/macros/s/AKfycbw8NZ3jQF_94zffSszG6x8I2Vx2dBfK4TAfFTg5x3quVHm9c1ICho96G4zOklAJaUo6/exec";
-
-    async function checkCode() {
-      const codeInput = document.getElementById("productCode");
+    async function validateCode() {
+      const input = document.getElementById("codeInput").value.trim();
       const resultDiv = document.getElementById("result");
-      const code = codeInput.value.trim().toUpperCase();
-
-      if (!code) {
-        resultDiv.innerText = "Please enter a product code.";
-        resultDiv.style.color = "#cc0000";
-        return;
-      }
-
-      resultDiv.innerText = "Checking...";
-      resultDiv.style.color = "#333";
+      resultDiv.innerHTML = "Checking...";
 
       try {
-        const response = await fetch(`${apiUrl}?code=${code}`);
+        const response = await fetch("https://api.sheetbest.com/sheets/c93fed9d-83c6-4c0c-b029-757f94880412");
         const data = await response.json();
 
-        if (data.valid) {
-          resultDiv.innerHTML = `✅ Authentic<br><strong>${data.product}</strong><br>Status: ${data.status}`;
-          resultDiv.style.color = "green";
+        const match = data.find(row => row.Code === input);
+
+        if (match) {
+          resultDiv.innerHTML = `<span style="color:green">✅ Authentic: ${match.Product} (${match.Status})</span>`;
         } else {
-          resultDiv.innerHTML = "❌ Invalid or counterfeit product code.";
-          resultDiv.style.color = "red";
+          resultDiv.innerHTML = `<span style="color:red">❌ Invalid code</span>`;
         }
-      } catch (error) {
-        console.error(error);
-        resultDiv.innerHTML = "⚠️ Error connecting to validation server....";
-        resultDiv.style.color = "orange";
+      } catch (err) {
+        resultDiv.innerHTML = `<span style="color:red">⚠️ Error fetching data</span>`;
+        console.error(err);
       }
     }
   </script>
