@@ -58,8 +58,37 @@
     <button onclick="checkCode()">Verify</button>
     <div id="result"></div>
   </div>
-  
-  <script>
+
+  function doGet(e) {
+  const code = e.parameter.code;
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("ProductCodes");
+  if (!sheet) {
+    return ContentService.createTextOutput(JSON.stringify({
+      valid: false,
+      error: "Sheet 'ProductCodes' not found"
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  const data = sheet.getDataRange().getValues();
+
+  for (let i = 1; i < data.length; i++){
+    if (data[i][0] === code) {
+      return ContentService
+        .createTextOutput(JSON.stringify({
+          valid: true,
+          product: data[i][1],
+          status: data[i][2]
+        }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+}
+  return ContentService
+    .createTextOutput(JSON.stringify({ valid: false }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+
+<!--  <script>
   const apiUrl = "https://script.google.com/macros/s/AKfycbw8NZ3jQF_94zffSszG6x8I2Vx2dBfK4TAfFTg5x3quVHm9c1ICho96G4zOklAJaUo6/exec"; // Replace with your Apps Script Web App URL
 
   async function checkCode() {
@@ -88,7 +117,7 @@
       resultDiv.style.color = "orange";
     }
   }
-</script>
+</script>--->
 
 
 <!--  <script>
