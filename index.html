@@ -62,7 +62,7 @@
   </div>
 
   <script>
-    const apiUrl = "https://script.google.com/macros/s/YOUR_SCRIPT_URL_HERE/exec";
+    const apiUrl = "https://script.google.com/macros/s/AKfycbw8NZ3jQF_94zffSszG6x8I2Vx2dBfK4TAfFTg5x3quVHm9c1ICho96G4zOklAJaUo6/exec";
 
     async function checkCode() {
       const codeInput = document.getElementById("productCode");
@@ -91,7 +91,7 @@
         }
       } catch (error) {
         console.error(error);
-        resultDiv.innerHTML = "⚠️ Error connecting to validation server.";
+        resultDiv.innerHTML = "⚠️ Error connecting to validation server....";
         resultDiv.style.color = "orange";
       }
     }
