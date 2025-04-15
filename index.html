@@ -62,11 +62,19 @@
   <script>
     window.onload = () => {
       const params = new URLSearchParams(window.location.search);
-      const code = params.get("code");
+      const encoded = params.get("enc");
+      let code = "";
+      if (encoded) {
+    try {
+      code = atob(encoded); // Decode base64
+    } catch (e) {
+      console.error("Invalid encoding", e);
+    }
+  }
       if (code) {
-        document.getElementById("codeInput").value = code;
-        checkProduct();
-      }
+    document.getElementById("codeInput").value = code;
+    checkProduct();
+  }
     };
     
     async function validateCode() {
