@@ -88,10 +88,18 @@
       }
     };
 
-    function maskCode(code) {
+    /*function maskCode(code) {
       if (code.length <= 4) return "****";
       const lastFour = code.slice(-4);
       return "****" + lastFour;
+    }*/
+    
+      function maskCode(code) {
+        if (code.length <= 2) return "*".repeat(code.length);
+        const first = code.charAt(0);
+        const last = code.charAt(code.length - 1);
+        const maskedMiddle = "*".repeat(code.length - 2);
+        return first + maskedMiddle + last;
     }
 
     async function validateCode() {
