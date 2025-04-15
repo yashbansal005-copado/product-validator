@@ -63,23 +63,24 @@
     window.onload = () => {
       const params = new URLSearchParams(window.location.search);
       const encoded = params.get("enc");
-      let code = "";
       if (encoded) {
-    try {
-      code = atob(encoded); // Decode base64
-    } catch (e) {
-      console.error("Invalid encoding", e);
-    }
-  }
-      if (code) {
-    document.getElementById("codeInput").value = code;
-    checkProduct();
-  }
+        try {
+          const decoded = atob(encoded);
+          document.getElementById("codeInput").value = decoded;
+          validateCode();
+        } catch (e) {
+          console.error("Invalid base64 encoding", e);
+        }
+      }
     };
     
     async function validateCode() {
       const input = document.getElementById("codeInput").value.trim();
       const resultDiv = document.getElementById("result");
+      if (!input) {
+        resultDiv.innerHTML = "❌ Please enter a code.";
+        return;
+      }
       resultDiv.innerHTML = "Checking...";
 
       try {
