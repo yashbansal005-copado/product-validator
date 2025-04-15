@@ -71,11 +71,10 @@
 
   <script>
     let originalCode = "";
-
+    let enc = "";
     window.onload = () => {
       const params = new URLSearchParams(window.location.search);
-      const enc = params.get("enc");
-
+      enc = params.get("enc");
       if (enc) {
         try {
           //const decoded = atob(enc);
@@ -99,12 +98,12 @@
       const userInput = document.getElementById("manualCode").value.trim();
       const resultDiv = document.getElementById("result");
 
-      if (!originalCode) {
+      if (!enc) {
         resultDiv.innerHTML = `<span style="color:red">⚠️ No scanned code found. Please scan QR.</span>`;
         return;
       }
 
-      if (userInput !== originalCode) {
+      if (userInput !== enc) {
         resultDiv.innerHTML = `<span style="color:red">❌ Code mismatch. Please check and try again.</span>`;
         return;
       }
