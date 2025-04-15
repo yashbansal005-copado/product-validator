@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Product Authenticity Checker</title>
   <style>
     body {
@@ -23,14 +23,14 @@
       width: 90%;
       max-width: 400px;
     }
-    h1 {
+    h2 {
       text-align: center;
       color: #2b7a78;
     }
     input[type="text"] {
       width: 100%;
       padding: 0.8rem;
-      margin: 1rem 0;
+      margin: 0.8rem 0;
       border: 1px solid #ccc;
       border-radius: 5px;
     }
@@ -49,45 +49,72 @@
       text-align: center;
       font-weight: bold;
     }
+    label {
+      font-size: 0.9rem;
+      color: #555;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>Check Product Authenticity</h2>
-    <input type="text" id="codeInput" placeholder="Enter product code" />
+
+    <label for="maskedCode">Scanned Code (Masked):</label>
+    <input type="text" id="maskedCode" readonly />
+
+    <label for="manualCode">Enter Code Manually:</label>
+    <input type="text" id="manualCode" placeholder="Enter product code" />
+
     <button onclick="validateCode()">Validate</button>
     <div id="result"></div>
   </div>
 
   <script>
+    let originalCode = "";
+
     window.onload = () => {
       const params = new URLSearchParams(window.location.search);
-      const encoded = params.get("enc");
-      if (encoded) {
+      const enc = params.get("enc");
+
+      if (enc) {
         try {
-          const decoded = atob(encoded);
-          document.getElementById("codeInput").value = decoded;
-          validateCode();
+          const decoded = atob(enc);
+          originalCode = decoded;
+          const masked = maskCode(decoded);
+          document.getElementById("maskedCode").value = masked;
         } catch (e) {
-          console.error("Invalid base64 encoding", e);
+          console.error("Invalid encoded string");
         }
       }
     };
-    
+
+    function maskCode(code) {
+      if (code.length <= 4) return "****";
+      const lastFour = code.slice(-4);
+      return "****" + lastFour;
+    }
+
     async function validateCode() {
-      const input = document.getElementById("codeInput").value.trim();
+      const userInput = document.getElementById("manualCode").value.trim();
       const resultDiv = document.getElementById("result");
-      if (!input) {
-        resultDiv.innerHTML = "❌ Please enter a code.";
+
+      if (!originalCode) {
+        resultDiv.innerHTML = `<span style="color:red">⚠️ No scanned code found. Please scan QR.</span>`;
         return;
       }
+
+      if (userInput !== originalCode) {
+        resultDiv.innerHTML = `<span style="color:red">❌ Code mismatch. Please check and try again.</span>`;
+        return;
+      }
+
       resultDiv.innerHTML = "Checking...";
 
       try {
         const response = await fetch("https://api.sheetbest.com/sheets/c93fed9d-83c6-4c0c-b029-757f94880412");
         const data = await response.json();
 
-        const match = data.find(row => row.Code === input);
+        const match = data.find(row => row.Code === userInput);
 
         if (match) {
           resultDiv.innerHTML = `<span style="color:green">✅ Authentic: ${match.Product} (${match.Status})</span>`;
