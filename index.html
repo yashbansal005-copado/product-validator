@@ -125,8 +125,17 @@
 
         const match = data.find(row => row.Code === userInput);
 
-        if (match) {
-          await fetch(`https://api.sheetbest.com/sheets/7b843d7a-47a4-406b-9555-28d60b46cd0c/Code/${userInput}`, {
+        if (!match) {
+          resultDiv.innerHTML = `<span style="color:red">❌ Invalid code</span>`;
+          return;
+        }
+
+        if (match.Scan && match.Scan.toLowerCase() === "scanned") {
+          resultDiv.innerHTML =
+          `<span style="color:red">⚠️ This product has already been scanned on ${match.ScanDateTime}</span>`;
+          return;
+        }
+        await fetch(`https://api.sheetbest.com/sheets/7b843d7a-47a4-406b-9555-28d60b46cd0c/Code/${userInput}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -135,9 +144,6 @@
             })
           });
           resultDiv.innerHTML = `<span style="color:green">✅ Authentic: ${match.Product} (${match.Status})</span>`;
-        } else {
-          resultDiv.innerHTML = `<span style="color:red">❌ Invalid code</span>`;
-        }
       } catch (err) {
         resultDiv.innerHTML = `<span style="color:red">⚠️ Error fetching data</span>`;
         console.error(err);
