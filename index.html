@@ -129,7 +129,10 @@
           await fetch(`https://api.sheetbest.com/sheets/7b843d7a-47a4-406b-9555-28d60b46cd0c/Code/${userInput}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ Scan: "Scanned" })
+            body: JSON.stringify({
+              Scan: "Scanned",
+              ScanDateTime: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
+            })
           });
           resultDiv.innerHTML = `<span style="color:green">✅ Authentic: ${match.Product} (${match.Status})</span>`;
         } else {
