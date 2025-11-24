@@ -120,7 +120,7 @@
 
       try {
         //const response = await fetch("https://api.sheetbest.com/sheets/c93fed9d-83c6-4c0c-b029-757f94880412");
-        const response = await fetch("https://app.sheetbest.com/admin/connection-detail/7b843d7a-47a4-406b-9555-28d60b46cd0c");
+        const response = await fetch("https://api.sheetbest.com/sheets/7b843d7a-47a4-406b-9555-28d60b46cd0c");
         const data = await response.json();
 
         const match = data.find(row => row.Code === userInput);
