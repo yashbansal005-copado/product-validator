@@ -143,7 +143,7 @@
               ScanDateTime: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
             })
           });
-          resultDiv.innerHTML = `<span style="color:green">✅ Authentic: ${match.Product} (${match.Status})</span>`;
+          resultDiv.innerHTML = `<span style="color:green">✅ Authentic: ${match.Product}</span>`;
       } catch (err) {
         resultDiv.innerHTML = `<span style="color:red">⚠️ Error fetching data</span>`;
         console.error(err);
