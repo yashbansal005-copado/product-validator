@@ -94,7 +94,7 @@
     <!--<label for="maskedCode">Scanned Code:</label>
     <input type="text" id="maskedCode" readonly aria-readonly="true" />-->
 
-    <label for="manualCode">Enter Code Manually:</label>
+    <label for="manualCode">Enter the code printed below the Hologram/QR code:</label>
     <input type="text" id="manualCode" placeholder="Enter product code" inputmode="text" />
 
     <button id="validateBtn" onclick="validateCode()">Validate</button>
@@ -107,23 +107,9 @@
     window.addEventListener('load', () => {
       const params = new URLSearchParams(window.location.search);
       enc = params.get("enc");
-      /*if (enc) {
-        try {
-          const masked = maskCode(enc);
-          document.getElementById("maskedCode").value = masked;
-        } catch (e) {
-          console.error("Invalid encoded string", e);
-        }
-      }*/
       // improve keyboard UX on mobile: focus manual input if no enc
       if (!enc) document.getElementById("manualCode").focus();
     });
-
-    /*function maskCode(code) {
-      if (!code) return "";
-      if (code.length <= 2) return "*".repeat(code.length);
-      return code.charAt(0) + "*".repeat(code.length - 2) + code.charAt(code.length - 1);
-    }*/
 
     async function validateCode(){
       const userInput = document.getElementById("manualCode").value.trim();
@@ -135,7 +121,8 @@
         return;
       }
 
-      if (userInput !== enc) {
+      //if (userInput !== enc) {
+      if (userInput.toLowerCase() !== enc.toLowerCase()) {
         resultDiv.innerHTML = `<span style="color:red">❌ Code mismatch. Please check and try again.</span>`;
         return;
       }
@@ -146,7 +133,8 @@
         const response = await fetch(sheetURL);
         const data = await response.json();
 
-        const match = data.find(row => row.Code === userInput);
+        //const match = data.find(row => row.Code === userInput);
+        const match = data.find(row => row.Code?.toLowerCase() === userInput.toLowerCase());
 
         if (!match) {
           resultDiv.innerHTML = `<span style="color:red">❌ Invalid code</span>`;
