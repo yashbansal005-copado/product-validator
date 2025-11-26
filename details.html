@@ -260,8 +260,8 @@ async function saveCustomerDetails() {
       CustomerPhone: phone
     })
   });
-
-  statusDiv.innerHTML = `<span style="color:green">Details saved successfully ✔</span>`;
+window.location.href = `thankyou.html?name=${encodeURIComponent(name)}&product=${encodeURIComponent(match.Product)}&code=${encodeURIComponent(code)}`;
+  //statusDiv.innerHTML = `<span style="color:green">Details saved successfully ✔</span>`;
 }
 </script>
 
