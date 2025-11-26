@@ -30,18 +30,47 @@
   }
 
   h2 { margin-top: 0; color: #1d3557; }
-  h3 { color: #264653; margin-bottom: 8px; }
+  h3 { color: #264653; margin-bottom: 8px; cursor: pointer; }
 
-  .section-card {
+  .accordion {
     background: #fafcff;
     border-left: 5px solid #2b7a78;
-    padding: 14px 16px;
     border-radius: 10px;
     margin-top: 18px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    overflow: hidden;
   }
 
-  .section-card p { margin: 6px 0; line-height: 1.45; }
+  .accordion-header {
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .accordion-content {
+    padding: 0 16px 14px;
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .accordion.open .accordion-content {
+    display: block;
+  }
+
+  .accordion-arrow {
+    font-size: 18px;
+    transition: 0.3s;
+  }
+
+  .accordion.open .accordion-arrow {
+    transform: rotate(90deg);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
   input {
     width: 100%;
@@ -80,7 +109,6 @@
 
 <div class="card">
 
-  <!-- 🎉 Added Congratulations Banner -->
   <div class="success-banner">
    🎉 Congratulations! Your product is genuine and authenticated.
   </div>
@@ -88,38 +116,67 @@
   <h2>Product Authenticity Details</h2>
 
   <div id="info"></div>
-  <div class="section-card">
-    <h3>Warranty Information</h3>
-    <p><b>Type:</b> Limited Manufacturer Warranty</p>
-    <p><b>Duration:</b> 12 Months from purchase date</p>
-    <p>Covers manufacturing defects and quality issues.</p>
-  </div>
-  <div class="section-card">
-    <h3>Care Instructions</h3>
-    <p>• Store in a cool, dry place</p>
-    <p>• Clean using a microfiber cloth</p>
-    <p>• Avoid water, chemicals & drops</p>
-    <p>• Do not self-repair or modify</p>
+
+  <!-- Accordion Sections -->
+  <div class="accordion">
+    <div class="accordion-header" onclick="toggleAccordion(this)">
+      <h3>Warranty Information</h3>
+      <span class="accordion-arrow">▶</span>
+    </div>
+    <div class="accordion-content">
+      <p><b>Type:</b> Limited Manufacturer Warranty</p>
+      <p><b>Duration:</b> 12 Months from purchase date</p>
+      <p>Covers manufacturing defects and quality issues.</p>
+    </div>
   </div>
 
-  <div class="section-card">
-    <h3>Factory Batch Information</h3>
-    <p><b>Inspection Level:</b> 4-step quality check</p>
-    <p><b>QC Engineer:</b> Senior Quality Specialist</p>
-    <p>Batch is certified before packaging.</p>
-  </div>
-  <div class="section-card">
-    <h3>Packaging Authenticity</h3>
-    <p>✔ Tamper-proof hologram</p>
-    <p>✔ Encrypted QR token (unclonable)</p>
-    <p>✔ Real-time scan traceability</p>
+  <div class="accordion">
+    <div class="accordion-header" onclick="toggleAccordion(this)">
+      <h3>Care Instructions</h3>
+      <span class="accordion-arrow">▶</span>
+    </div>
+    <div class="accordion-content">
+      <p>• Store in a cool, dry place</p>
+      <p>• Clean using a microfiber cloth</p>
+      <p>• Avoid water, chemicals & drops</p>
+      <p>• Do not self-repair or modify</p>
+    </div>
   </div>
 
-  <div class="section-card">
-    <h3>Manufacturer Details</h3>
-    <p><b>Company:</b> SF Dynamix Industries Pvt. Ltd.</p>
-    <p><b>HQ:</b> Bengaluru, India</p>
-    <p><b>Plant:</b> Coimbatore, Tamil Nadu (ISO Certified)</p>
+  <div class="accordion">
+    <div class="accordion-header" onclick="toggleAccordion(this)">
+      <h3>Factory Batch Information</h3>
+      <span class="accordion-arrow">▶</span>
+    </div>
+    <div class="accordion-content">
+      <p><b>Inspection Level:</b> 4-step quality check</p>
+      <p><b>QC Engineer:</b> Senior Quality Specialist</p>
+      <p>Batch is certified before packaging.</p>
+    </div>
+  </div>
+
+  <div class="accordion">
+    <div class="accordion-header" onclick="toggleAccordion(this)">
+      <h3>Packaging Authenticity</h3>
+      <span class="accordion-arrow">▶</span>
+    </div>
+    <div class="accordion-content">
+      <p>✔ Tamper-proof hologram</p>
+      <p>✔ Encrypted QR token (unclonable)</p>
+      <p>✔ Real-time scan traceability</p>
+    </div>
+  </div>
+
+  <div class="accordion">
+    <div class="accordion-header" onclick="toggleAccordion(this)">
+      <h3>Manufacturer Details</h3>
+      <span class="accordion-arrow">▶</span>
+    </div>
+    <div class="accordion-content">
+      <p><b>Company:</b> SF Dynamix Industries Pvt. Ltd.</p>
+      <p><b>HQ:</b> Bengaluru, India</p>
+      <p><b>Plant:</b> Coimbatore, Tamil Nadu (ISO Certified)</p>
+    </div>
   </div>
 
   <h3>Register Your Warranty</h3>
@@ -138,7 +195,6 @@
 <script>
 const sheetURL = "https://api.sheetbest.com/sheets/7b843d7a-47a4-406b-9555-28d60b46cd0c";
 
-// Read code from URL
 const params = new URLSearchParams(window.location.search);
 const code = params.get("code");
 
@@ -161,9 +217,10 @@ window.onload = async () => {
   `;
 };
 
-function maskCode(code) {
-  if (code.length <= 2) return "*".repeat(code.length);
-  return code.charAt(0) + "*".repeat(code.length - 2) + code.charAt(code.length - 1);
+// Accordion Logic
+function toggleAccordion(header) {
+  const parent = header.parentElement;
+  parent.classList.toggle("open");
 }
 
 async function saveCustomerDetails() {
