@@ -202,7 +202,9 @@
     <input id="custName" type="text" placeholder="Enter your full name" />
 
     <label for="custPhone">Phone Number:</label>
-    <input id="custPhone" type="text" placeholder="Enter your phone number" />
+    <input id="custPhone" type="text" placeholder="Enter your phone number"
+       maxlength="10" inputmode="numeric" oninput="this.value = this.value.replace(/\\D/g,'')">
+
 
     <button id="saveBtn" onclick="saveCustomerDetails()">Save Details</button>
     <div id="status" role="status" aria-live="polite"></div>
@@ -263,6 +265,11 @@ async function saveCustomerDetails(){
   if(!name || !phone){
     statusDiv.innerHTML = `<span style="color:#b00020">Please fill all fields</span>`;
     return;
+  }
+
+  if (!/^[0-9]{10}$/.test(phone)) {
+  statusDiv.innerHTML = `<span style="color:red">Enter a valid 10-digit phone number</span>`;
+  return;
   }
 
   if(!matchedRecord){
