@@ -223,7 +223,8 @@ window.addEventListener('load', async () => {
   try {
     const response = await fetch(sheetURL);
     const data = await response.json();
-    matchedRecord = data.find(row => row.Code === code);
+    //matchedRecord = data.find(row => row.Code === code);
+    matchedRecord = data.find(row => row.Code?.toLowerCase() === code.toLowerCase());
 
     if (!matchedRecord) {
       infoDiv.innerHTML = `<div style="color:#b00020;font-weight:600">Invalid Code</div>`;
