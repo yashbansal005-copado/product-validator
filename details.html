@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Product Details</title>
+<style>
+  body {
+    font-family: Arial;
+    background: #f0f4f8;
+    padding: 20px;
+  }
+  .card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    max-width: 450px;
+    margin: auto;
+  }
+  input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+  button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 15px;
+    background: #2b7a78;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h2>Product Authenticity Details</h2>
+
+  <div id="info"></div>
+
+  <h3>Enter Your Details</h3>
+  <label>Name:</label>
+  <input type="text" id="custName" placeholder="Enter your name">
+
+  <label>Phone Number:</label>
+  <input type="text" id="custPhone" placeholder="Enter phone number">
+
+  <button onclick="saveCustomerDetails()">Save</button>
+
+  <div id="status"></div>
+</div>
+
+<script>
+const sheetURL = "https://api.sheetbest.com/sheets/7b843d7a-47a4-406b-9555-28d60b46cd0c";
+
+// Read code from URL
+const params = new URLSearchParams(window.location.search);
+const code = params.get("code");
+
+window.onload = async () => {
+  const infoDiv = document.getElementById("info");
+
+  const response = await fetch(sheetURL);
+  const data = await response.json();
+
+  const match = data.find(row => row.Code === code);
+
+  if (!match) {
+    infoDiv.innerHTML = `<span style="color:red">Invalid Code</span>`;
+    return;
+  }
+
+  infoDiv.innerHTML = `
+    <p><b>Product:</b> ${match.Product}</p>
+    <p><b>Status:</b> ${match.Status}</p>
+    <p><b>Code:</b> ${maskCode(code)}</p>
+    <p><b>Scan Time:</b> ${match.ScanDateTime}</p>
+  `;
+};
+
+function maskCode(code) {
+  if (code.length <= 2) return "*".repeat(code.length);
+  return code.charAt(0) + "*".repeat(code.length - 2) + code.charAt(code.length - 1);
+}
+
+async function saveCustomerDetails() {
+  const name = document.getElementById("custName").value;
+  const phone = document.getElementById("custPhone").value;
+  const statusDiv = document.getElementById("status");
+
+  if (!name || !phone) {
+    statusDiv.innerHTML = `<span style="color:red">Please fill all fields</span>`;
+    return;
+  }
+
+  await fetch(`${sheetURL}/Code/${code}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      CustomerName: name,
+      CustomerPhone: phone
+    })
+  });
+
+  statusDiv.innerHTML = `<span style="color:green">Details saved successfully ✔</span>`;
+}
+</script>
+
+</body>
+</html>
