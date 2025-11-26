@@ -121,7 +121,7 @@ function maskCode(code) {
 async function saveCustomerDetails() {
   const name = document.getElementById("custName").value;
   const phone = document.getElementById("custPhone").value;
-  //const statusDiv = document.getElementById("status");
+  const statusDiv = document.getElementById("status");
 
   if (!name || !phone) {
     statusDiv.innerHTML = `<span style="color:red">Please fill all fields</span>`;
