@@ -157,7 +157,7 @@
         });
 
         // redirect to details page with encoded URI component
-        window.location.href = `details.html?code=${encodeURIComponent(toUpperCase(userInput))}`;
+        window.location.href = `details.html?code=${encodeURIComponent(userInput)}`;
       } catch (err) {
         console.error(err);
         resultDiv.innerHTML = `<span style="color:red">⚠️ Error fetching data</span>`;
