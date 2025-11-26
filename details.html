@@ -33,39 +33,51 @@
   h3 { color: #264653; margin-bottom: 8px; cursor: pointer; }
 
   .accordion {
-    background: #fafcff;
-    border-left: 5px solid #2b7a78;
-    border-radius: 10px;
-    margin-top: 18px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    overflow: hidden;
-  }
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(6px);
+  border-radius: 14px;
+  border-left: 5px solid #2b7a78;
+  margin-top: 20px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  overflow: hidden;
+  transition: 0.3s ease;
+}
 
-  .accordion-header {
-    padding: 14px 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+.accordion-header {
+  padding: 16px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
 
-  .accordion-content {
-    padding: 0 16px 14px;
-    display: none;
-    animation: fadeIn 0.3s ease;
-  }
+.accordion-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #133b5c;
+}
 
-  .accordion.open .accordion-content {
-    display: block;
-  }
+.accordion-arrow {
+  font-size: 20px;
+  transition: transform 0.35s ease;
+  color: #0f4c5c;
+}
 
-  .accordion-arrow {
-    font-size: 18px;
-    transition: 0.3s;
-  }
+.accordion.open .accordion-arrow {
+  transform: rotate(90deg);
+}
 
-  .accordion.open .accordion-arrow {
-    transform: rotate(90deg);
-  }
+.accordion-content {
+  overflow: hidden;
+  max-height: 0;
+  padding: 0 18px;
+  transition: max-height 0.4s ease, padding 0.3s ease;
+}
+
+.accordion.open .accordion-content {
+  max-height: 500px;
+  padding: 10px 18px 18px;
+}
 
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-4px); }
@@ -219,9 +231,16 @@ window.onload = async () => {
 
 // Accordion Logic
 function toggleAccordion(header) {
-  const parent = header.parentElement;
-  parent.classList.toggle("open");
+  const current = header.parentElement;
+  const allAccordions = document.querySelectorAll(".accordion");
+
+  allAccordions.forEach(acc => {
+    if (acc !== current) acc.classList.remove("open");
+  });
+
+  current.classList.toggle("open");
 }
+  
 
 async function saveCustomerDetails() {
   const name = document.getElementById("custName").value;
