@@ -91,8 +91,8 @@
   <div class="container" role="main" aria-labelledby="title">
     <h2 id="title">Check Product Authenticity</h2>
 
-    <label for="maskedCode">Scanned Code:</label>
-    <input type="text" id="maskedCode" readonly aria-readonly="true" />
+    <!--<label for="maskedCode">Scanned Code:</label>
+    <input type="text" id="maskedCode" readonly aria-readonly="true" />-->
 
     <label for="manualCode">Enter Code Manually:</label>
     <input type="text" id="manualCode" placeholder="Enter product code" inputmode="text" />
@@ -107,23 +107,23 @@
     window.addEventListener('load', () => {
       const params = new URLSearchParams(window.location.search);
       enc = params.get("enc");
-      if (enc) {
+      /*if (enc) {
         try {
           const masked = maskCode(enc);
           document.getElementById("maskedCode").value = masked;
         } catch (e) {
           console.error("Invalid encoded string", e);
         }
-      }
+      }*/
       // improve keyboard UX on mobile: focus manual input if no enc
       if (!enc) document.getElementById("manualCode").focus();
     });
 
-    function maskCode(code) {
+    /*function maskCode(code) {
       if (!code) return "";
       if (code.length <= 2) return "*".repeat(code.length);
       return code.charAt(0) + "*".repeat(code.length - 2) + code.charAt(code.length - 1);
-    }
+    }*/
 
     async function validateCode(){
       const userInput = document.getElementById("manualCode").value.trim();
