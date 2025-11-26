@@ -4,87 +4,154 @@
 <title>Product Details</title>
 <style>
   body {
-    font-family: Arial;
-    background: #f0f4f8;
-    padding: 20px;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(135deg, #e8f1f5, #ffffff);
+    padding: 40px;
   }
+  
   .card {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    max-width: 450px;
+    backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.7);
+    padding: 30px;
+    border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.10);
+    max-width: 520px;
     margin: auto;
-    animation: fadeIn 0.6s ease;
+    animation: fadeIn 0.7s ease;
+  }
+
+  .seal-container {
+    text-align: center;
+    margin-bottom: 15px;
+  }
+
+   .seal {
+    width: 90px;
+    height: 90px;
+    margin: auto;
+    background: linear-gradient(135deg, #f6d365, #fda085);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 38px;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 5px 12px rgba(255, 179, 71, 0.4);
+    animation: popIn 0.6s ease;
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.4); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
   }
 
   /* Success Banner */
   .success-banner {
-    background: #2ecc71;
+    background: linear-gradient(90deg, #2ecc71, #27ae60);
     color: white;
-    padding: 15px;
+    padding: 14px;
     text-align: center;
     border-radius: 10px;
     font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-    animation: slideDown 0.6s ease;
+    font-weight: 600;
+    margin-bottom: 22px;
+    box-shadow: 0 5px 15px rgba(39, 174, 96, 0.35);
+    animation: slideDown 0.7s ease;
   }
 
   @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.97); }
-    to { opacity: 1; transform: scale(1); }
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes slideDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  h2 {
+    text-align: center;
+    color: #1f3c88;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .info-box p {
+    font-size: 15px;
+    margin: 6px 0;
+  }
+
+  label {
+    font-size: 14px;
+    color: #333;
+    font-weight: 600;
   }
 
   input {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     margin-top: 8px;
     border: 1px solid #ccc;
-    border-radius: 6px;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: 0.2s;
   }
-  button {
+
+  input:focus {
+    border-color: #2b7a78;
+    outline: none;
+    box-shadow: 0 0 6px rgba(43,122,120,0.3);
+  }
+
+   button {
     width: 100%;
-    padding: 12px;
-    margin-top: 15px;
-    background: #2b7a78;
+    padding: 14px;
+    margin-top: 18px;
+    background: linear-gradient(135deg, #2b7a78, #1d5d59);
     color: white;
     border: none;
-    border-radius: 6px;
-    font-size: 16px;
+    border-radius: 8px;
+    font-size: 17px;
     cursor: pointer;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+    transition: 0.2s;
   }
+  button:hover {
+    transform: scale(1.03);
+  }
+  
 </style>
 </head>
 <body>
 
 <div class="card">
+  <div class="seal-container">
+    <div class="seal">✓</div>
+  </div>
 
   <!-- 🎉 Added Congratulations Banner -->
   <div class="success-banner">
-    ✅ Your product is genuine and has been authenticated!
+   🎉 Congratulations! Your product is genuine and authenticated.
   </div>
 
   <h2>Product Authenticity Details</h2>
 
-  <div id="info"></div>
+  <div class="info-box" id="info"></div>
 
-  <h3>Enter Your Details</h3>
+  <h3 style="margin-top: 25px; color:#1f3c88">Enter Your Details</h3>
+
   <label>Name:</label>
-  <input type="text" id="custName" placeholder="Enter your name">
+  <input type="text" id="custName" placeholder="Enter your full name">
 
-  <label>Phone Number:</label>
-  <input type="text" id="custPhone" placeholder="Enter phone number">
+  <label style="margin-top:15px;">Phone Number:</label>
+  <input type="text" id="custPhone" placeholder="Enter your phone number">
+  
+  <button onclick="saveCustomerDetails()">Save Details</button>
 
-  <button onclick="saveCustomerDetails()">Save</button>
-
-  <div id="status"></div>
+  <div id="status" style="margin-top:15px; font-weight:600;"></div>
 </div>
 
 <script>
@@ -109,10 +176,7 @@ window.onload = async () => {
 
   infoDiv.innerHTML = `
     <p><b>Product:</b> ${match.Product}</p>
-    <p><b>Code:</b> ${match.code}</p>
-    <p><b>Code1:</b> code</p>
-    <p><b>Code2:</b> ${code}</p>
-    <p><b>Code3:</b> {code}</p>
+    <p><b>Code:</b> ${code}</p>
   `;
 };
 
