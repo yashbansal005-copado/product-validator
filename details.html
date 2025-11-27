@@ -296,7 +296,7 @@ async function saveCustomerDetails(){
     });
 
     // redirect to thank you with safe query params
-    const url = `thankyou.html?name=${encodeURIComponent(name)}&product=${encodeURIComponent(matchedRecord.Product)}&code=${encodeURIComponent(code)}`;
+    const url = `thankyou.html?name=${encodeURIComponent(name)}&product=${encodeURIComponent(matchedRecord.Product)}&code=${encodeURIComponent(matchedRecord.Code)}`;
     window.location.href = url;
   } catch (e) {
     console.error(e);
