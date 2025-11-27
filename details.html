@@ -232,7 +232,7 @@ window.addEventListener('load', async () => {
       return;
     }
 
-    infoDiv.innerHTML = `<p><b>Product:</b> ${matchedRecord.Product}</p><p><b>Code:</b> ${code}</p>`;
+    infoDiv.innerHTML = `<p><b>Product:</b> ${matchedRecord.Product}</p><p><b>Code:</b> ${matchedRecord.Code}</p>`;
   } catch (e) {
     console.error(e);
     infoDiv.innerHTML = `<div style="color:#b00020;font-weight:600">Error loading product</div>`;
