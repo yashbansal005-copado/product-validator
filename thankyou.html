@@ -25,12 +25,6 @@
     border-radius: 18px;
     box-shadow: 0 8px 28px rgba(0,0,0,0.15);
     text-align: center;
-    animation: fadeInUp 0.8s ease;
-  }
-
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(40px); }
-    to { opacity: 1; transform: translateY(0); }
   }
 
   .tick-circle {
@@ -44,41 +38,13 @@
     margin: 0 auto 20px;
   }
 
-  .tick {
-    font-size: 60px;
-    color: white;
-    font-weight: bold;
-  }
-
   h1 {
     color: #1a4d7a;
     font-size: 26px;
     font-weight: 700;
-    margin-bottom: 12px;
   }
 
-  p {
-    color: #4b4b4b;
-    font-size: 16px;
-    line-height: 1.5;
-    margin-bottom: 18px;
-  }
-
-  .details-box {
-    background: #f7fbff;
-    border-left: 5px solid #2b7a78;
-    padding: 14px;
-    border-radius: 10px;
-    text-align: left;
-    margin-top: 20px;
-  }
-
-  .details-box p {
-    margin: 6px 0;
-    font-size: 15px;
-  }
-
-  /* ✨ SCRATCH CARD POPUP */
+  /* Screen popup */
   .scratch-popup-bg {
     position: fixed;
     top: 0; left: 0;
@@ -97,181 +63,172 @@
     max-width: 380px;
     border-radius: 16px;
     text-align: center;
-    position: relative;
-    touch-action: none;  /* prevents scroll/shake */
   }
 
-  #scratchCanvas {
+  /* Scratch container (reward inside) */
+  .scratch-area {
+    position: relative;
     width: 100%;
     height: 180px;
-    border-radius: 12px;
-    background: #ccc;
     margin-top: 15px;
-    touch-action: none; /* prevent screen scrolling */
+    border-radius: 12px;
+    overflow: hidden;
   }
 
-  .reward-text {
-    font-size: 26px;
+  /* Reward text (BEHIND the canvas) */
+  .reward-inside {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 32px;
     font-weight: bold;
-    margin-top: 10px;
     color: #2b7a78;
-    display: none; /* hidden until fully scratched */
+    z-index: 1; /* below canvas */
+    pointer-events: none;
+  }
+
+  /* Canvas silver scratch layer */
+  #scratchCanvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border-radius: 12px;
+    background: #b5b5b5;
+    z-index: 2; /* above reward */
+    touch-action: none;
   }
 
   .close-btn {
-    margin-top: 15px;
+    margin-top: 18px;
     background: #2b7a78;
-    padding: 12px 20px;
-    border-radius: 10px;
-    color: white;
-    border: none;
+    padding: 12px;
     width: 100%;
+    border-radius: 10px;
+    color: #fff;
+    border: none;
     font-size: 18px;
     display: none;
-    cursor: pointer;
   }
-
 </style>
 </head>
 
 <body>
 
 <div class="container">
-
-  <div class="tick-circle">
-    <div class="tick">✔</div>
-  </div>
-
+  <div class="tick-circle"><div class="tick">✔</div></div>
   <h1>Thank You!</h1>
   <p>Your warranty has been successfully registered.</p>
-
   <div class="details-box" id="detailsBox"></div>
 </div>
 
-<!-- 🎉 SCRATCH CARD POPUP -->
+<!-- Popup -->
 <div class="scratch-popup-bg" id="popupBG">
   <div class="scratch-popup">
-    <h2>Scratch & Win! 🎁</h2>
-    <p>Scratch the card below to reveal your reward</p>
+    <h2>Scratch & Win 🎁</h2>
 
-    <!-- Hidden reward -->
-    <div id="rewardValue" style="display:none;">₹50 Cashback</div>
-
-    <canvas id="scratchCanvas"></canvas>
-
-    <div class="reward-text" id="rewardText"></div>
+    <div class="scratch-area">
+      <div id="rewardText" class="reward-inside"></div>
+      <canvas id="scratchCanvas"></canvas>
+    </div>
 
     <button class="close-btn" id="closeBtn" onclick="closePopup()">OK</button>
   </div>
 </div>
 
-
 <script>
-  /* ------------------------------
-       LOAD URL PARAMS
-  ------------------------------ */
-  const params = new URLSearchParams(window.location.search);
-  const name = params.get("name");
-  const product = params.get("product");
-  const code = params.get("code");
+/* Load page params */
+const params = new URLSearchParams(window.location.search);
+document.getElementById("detailsBox").innerHTML = `
+  <p><b>Customer Name:</b> ${params.get("name")}</p>
+  <p><b>Product:</b> ${params.get("product")}</p>
+  <p><b>Registration Code:</b> ${params.get("code")}</p>
+`;
 
-  document.getElementById("detailsBox").innerHTML = `
-      <p><b>Customer Name:</b> ${name}</p>
-      <p><b>Product:</b> ${product}</p>
-      <p><b>Registration Code:</b> ${code}</p>
-  `;
+/* Random rewards */
+const rewards = [
+  "₹10 Cashback",
+  "₹20 Cashback",
+  "₹50 Cashback",
+  "₹75 Cashback",
+  "₹100 Cashback",
+  "₹150 Gift Voucher",
+  "₹200 Gift Card"
+];
 
-  /* ------------------------------
-       OPEN SCRATCH CARD POPUP
-  ------------------------------ */
-  window.onload = () => {
-    setTimeout(() => {
-      document.getElementById("popupBG").style.display = "flex";
-      initScratchCard();
-    }, 800);
-  };
+const selectedReward = rewards[Math.floor(Math.random() * rewards.length)];
+document.getElementById("rewardText").innerText = selectedReward;
 
+/* Show popup */
+window.onload = () => {
+  setTimeout(() => {
+    document.getElementById("popupBG").style.display = "flex";
+    initScratchCard();
+  }, 900);
+};
 
-  /* ------------------------------
-        SCRATCH CARD LOGIC
-  ------------------------------ */
-  function initScratchCard() {
-    const canvas = document.getElementById("scratchCanvas");
-    const ctx = canvas.getContext("2d");
-    const rewardText = document.getElementById("rewardText");
-    const rewardValue = document.getElementById("rewardValue").innerText;
-    const closeBtn = document.getElementById("closeBtn");
+/* SCRATCH LOGIC */
+function initScratchCard() {
+  const canvas = document.getElementById("scratchCanvas");
+  const ctx = canvas.getContext("2d");
+  const rewardText = document.getElementById("rewardText");
+  const closeBtn = document.getElementById("closeBtn");
 
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
 
-    ctx.fillStyle = "#b5b5b5";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#b5b5b5";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    let scratching = false;
+  let scratching = false;
 
-    function scratch(e) {
-      const rect = canvas.getBoundingClientRect();
-      let x, y;
+  function scratch(e) {
+    const rect = canvas.getBoundingClientRect();
+    let x, y;
 
-      if (e.touches) {
-        x = e.touches[0].clientX - rect.left;
-        y = e.touches[0].clientY - rect.top;
-      } else {
-        x = e.clientX - rect.left;
-        y = e.clientY - rect.top;
-      }
-
-      ctx.globalCompositeOperation = "destination-out";
-      ctx.beginPath();
-      ctx.arc(x, y, 25, 0, Math.PI * 2);
-      ctx.fill();
-
-      checkReveal();
+    if (e.touches) {
+      x = e.touches[0].clientX - rect.left;
+      y = e.touches[0].clientY - rect.top;
+    } else {
+      x = e.clientX - rect.left;
+      y = e.clientY - rect.top;
     }
 
-    /* Prevent screen shake */
-    canvas.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      scratching = true;
-    });
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.beginPath();
+    ctx.arc(x, y, 25, 0, Math.PI * 2);
+    ctx.fill();
 
-    canvas.addEventListener("touchend", (e) => {
-      e.preventDefault();
-      scratching = false;
-    });
+    checkReveal();
+  }
 
-    canvas.addEventListener("touchmove", (e) => {
-      e.preventDefault();
-      if (scratching) scratch(e);
-    });
+  canvas.addEventListener("mousedown", () => scratching = true);
+  canvas.addEventListener("mouseup", () => scratching = false);
+  canvas.addEventListener("mousemove", (e) => scratching && scratch(e));
 
-    canvas.addEventListener("mousedown", () => scratching = true);
-    canvas.addEventListener("mouseup", () => scratching = false);
-    canvas.addEventListener("mousemove", (e) => { if (scratching) scratch(e); });
+  canvas.addEventListener("touchstart", (e) => { scratching = true; e.preventDefault(); });
+  canvas.addEventListener("touchend", () => scratching = false);
+  canvas.addEventListener("touchmove", (e) => { e.preventDefault(); scratching && scratch(e); });
 
+  function checkReveal() {
+    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    let cleared = 0;
 
-    function checkReveal() {
-      const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-      let cleared = 0;
+    for (let i = 3; i < pixels.length; i += 4) {
+      if (pixels[i] === 0) cleared++;
+    }
 
-      for (let i = 3; i < pixels.length; i += 4) {
-        if (pixels[i] === 0) cleared++;
-      }
+    const percent = (cleared / (canvas.width * canvas.height)) * 100;
 
-      const percent = (cleared / (canvas.width * canvas.height)) * 100;
-
-      if (percent > 45) {
-        rewardText.innerText = rewardValue;
-        rewardText.style.display = "block";
-        closeBtn.style.display = "block";
-      }
+    if (percent > 45) {
+      canvas.style.opacity = "0";
+      closeBtn.style.display = "block";
     }
   }
+}
 
-  function closePopup() {
-    document.getElementById("popupBG").style.display = "none";
-  }
+function closePopup() {
+  document.getElementById("popupBG").style.display = "none";
+}
 </script>
 
 </body>
