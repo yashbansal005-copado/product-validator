@@ -144,6 +144,7 @@
 const sheetURL = "https://api.sheetbest.com/sheets/7b843d7a-47a4-406b-9555-28d60b46cd0c";
 /* Load params */
 const params = new URLSearchParams(window.location.search);
+const code = params.get("code");
 document.getElementById("detailsBox").innerHTML = `
   <p><b>Customer Name:</b> ${params.get("name")}</p>
   <p><b>Product:</b> ${params.get("product")}</p>
@@ -232,17 +233,15 @@ function initScratchCard() {
       if (!window.savedReward) {
       window.savedReward = true;
 
-      fetch(sheetURL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: params.get("name"),
-          product: params.get("product"),
-          code: params.get("code"),
-          reward: selectedReward,
-          time: new Date().toISOString()
-        })
-      });
+      const payload = {
+      CashReward: selectedReward
+    };
+
+    await fetch(`${sheetURL}/Code/${encodeURIComponent(code)}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
   }
     }
   }
