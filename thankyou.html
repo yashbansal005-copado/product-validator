@@ -38,7 +38,7 @@
   margin: auto;
 }
 
-/* Prize text under scratch layer */
+/* Prize text under scratch layer (hidden initially) */
 .prize-text {
   position: absolute;
   top: 50%;
@@ -47,6 +47,7 @@
   font-size: 26px;
   font-weight: bold;
   color: #2b9a2b;
+  visibility: hidden;
 }
 
 /* Close button */
@@ -93,12 +94,10 @@ body {
 </div>
 
 <script>
-// When page loads → open scratch popup
-window.onload = function () {
-    openScratchPopup();
-};
+// Show popup on load
+window.onload = () => openScratchPopup();
 
-// Open popup + random prize
+// Open popup + assign random prize
 function openScratchPopup() {
     document.getElementById("scratchPopup").style.display = "flex";
 
@@ -113,11 +112,12 @@ function closeScratchPopup() {
     document.getElementById("scratchPopup").style.display = "none";
 }
 
-// Draw scratch layer + erase on touch/mouse
 function initScratchCard() {
     const canvas = document.getElementById("scratchCanvas");
     const ctx = canvas.getContext("2d");
+    const prizeText = document.getElementById("prizeText");
 
+    // Fill with grey scratchable layer
     ctx.fillStyle = "#C0C0C0";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -139,12 +139,32 @@ function initScratchCard() {
         ctx.beginPath();
         ctx.arc(pos.x, pos.y, 20, 0, Math.PI * 2);
         ctx.fill();
+
+        checkScratchPercentage();
     }
 
+    function checkScratchPercentage() {
+        const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+        let cleared = 0;
+        for (let i = 3; i < pixels.length; i += 4) {
+            if (pixels[i] === 0) cleared++; // alpha = 0 → cleared
+        }
+
+        const percent = (cleared / (pixels.length / 4)) * 100;
+
+        // Reveal prize only after 60% scratched
+        if (percent > 60) {
+            prizeText.style.visibility = "visible";
+        }
+    }
+
+    // Mouse events
     canvas.addEventListener("mousedown", () => scratching = true);
     canvas.addEventListener("mouseup", () => scratching = false);
     canvas.addEventListener("mousemove", scratch);
 
+    // Touch events
     canvas.addEventListener("touchstart", () => scratching = true);
     canvas.addEventListener("touchend", () => scratching = false);
     canvas.addEventListener("touchmove", scratch);
