@@ -44,7 +44,7 @@
     font-weight: 700;
   }
 
-  /* Screen popup */
+  /* Popup overlay */
   .scratch-popup-bg {
     position: fixed;
     top: 0; left: 0;
@@ -53,7 +53,8 @@
     display: none;
     justify-content: center;
     align-items: center;
-    z-index: 999;
+    z-index: 9999;
+    touch-action: none;
   }
 
   .scratch-popup {
@@ -63,9 +64,10 @@
     max-width: 380px;
     border-radius: 16px;
     text-align: center;
+    position: relative;
   }
 
-  /* Scratch container (reward inside) */
+  /* Scratch Area */
   .scratch-area {
     position: relative;
     width: 100%;
@@ -73,9 +75,10 @@
     margin-top: 15px;
     border-radius: 12px;
     overflow: hidden;
+    touch-action: none; /* prevents shaking */
   }
 
-  /* Reward text (BEHIND the canvas) */
+  /* Prize text */
   .reward-inside {
     position: absolute;
     top: 50%; left: 50%;
@@ -83,19 +86,21 @@
     font-size: 32px;
     font-weight: bold;
     color: #2b7a78;
-    z-index: 1; /* below canvas */
+    z-index: 1;
     pointer-events: none;
+    text-align: center;
   }
 
-  /* Canvas silver scratch layer */
+  /* Scratch layer */
   #scratchCanvas {
     position: absolute;
     top: 0; left: 0;
-    width: 100%; height: 100%;
+    width: 100%; 
+    height: 100%;
     border-radius: 12px;
-    background: #b5b5b5;
-    z-index: 2; /* above reward */
-    touch-action: none;
+    background: #b5b5b5; /* silver layer */
+    z-index: 2; 
+    touch-action: none; /* prevents scroll shake */
   }
 
   .close-btn {
@@ -136,7 +141,7 @@
 </div>
 
 <script>
-/* Load page params */
+/* Load params */
 const params = new URLSearchParams(window.location.search);
 document.getElementById("detailsBox").innerHTML = `
   <p><b>Customer Name:</b> ${params.get("name")}</p>
@@ -144,7 +149,7 @@ document.getElementById("detailsBox").innerHTML = `
   <p><b>Registration Code:</b> ${params.get("code")}</p>
 `;
 
-/* Random rewards */
+/* Rewards */
 const rewards = [
   "₹10 Cashback",
   "₹20 Cashback",
@@ -161,16 +166,16 @@ document.getElementById("rewardText").innerText = selectedReward;
 /* Show popup */
 window.onload = () => {
   setTimeout(() => {
+    document.body.style.overflow = "hidden"; 
     document.getElementById("popupBG").style.display = "flex";
     initScratchCard();
-  }, 900);
+  }, 700);
 };
 
-/* SCRATCH LOGIC */
+/* Scratch logic */
 function initScratchCard() {
   const canvas = document.getElementById("scratchCanvas");
   const ctx = canvas.getContext("2d");
-  const rewardText = document.getElementById("rewardText");
   const closeBtn = document.getElementById("closeBtn");
 
   canvas.width = canvas.offsetWidth;
@@ -207,7 +212,7 @@ function initScratchCard() {
 
   canvas.addEventListener("touchstart", (e) => { scratching = true; e.preventDefault(); });
   canvas.addEventListener("touchend", () => scratching = false);
-  canvas.addEventListener("touchmove", (e) => { e.preventDefault(); scratching && scratch(e); });
+  canvas.addEventListener("touchmove", (e) => { scratching && scratch(e); e.preventDefault(); });
 
   function checkReveal() {
     const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
@@ -219,7 +224,8 @@ function initScratchCard() {
 
     const percent = (cleared / (canvas.width * canvas.height)) * 100;
 
-    if (percent > 45) {
+    if (percent > 50) {
+      canvas.style.pointerEvents = "none";
       canvas.style.opacity = "0";
       closeBtn.style.display = "block";
     }
@@ -228,6 +234,7 @@ function initScratchCard() {
 
 function closePopup() {
   document.getElementById("popupBG").style.display = "none";
+  document.body.style.overflow = "auto";
 }
 </script>
 
