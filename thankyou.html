@@ -2,116 +2,154 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Thank You – Warranty Registered</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thank You</title>
 
 <style>
-  :root{
-    --brand:#2b7a78;
-    --bg1: #e0f7fa;
-    --bg2: #e8f9ff;
-    --card:#fff;
-  }
-  html,body{height:100%;margin:0;}
-  body {
-    margin: 0;
-    font-family: 'Segoe UI', Roboto, Arial;
-    background: linear-gradient(135deg, var(--bg1), var(--bg2), #ffffff);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding:20px;
-  }
+/* Popup background */
+.scratch-popup {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.65);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
 
-  .container {
-    background: var(--card);
-    width: 100%;
-    max-width: 520px;
-    padding: 28px;
-    border-radius: 18px;
-    box-shadow: 0 8px 28px rgba(0,0,0,0.15);
-    text-align: center;
-    box-sizing: border-box;
-  }
+/* Popup box */
+.scratch-popup-content {
+  background: #fff;
+  padding: 25px;
+  border-radius: 15px;
+  text-align: center;
+  width: 90%;
+  max-width: 380px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+}
 
-  .tick-circle {
-    width: 110px;
-    height: 110px;
-    background: linear-gradient(135deg, #2ecc71, #27ae60);
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0 auto 16px;
-  }
+/* Scratch area container */
+.scratch-card-container {
+  position: relative;
+  width: 300px;
+  margin: auto;
+}
 
-  .tick { font-size:54px; color:#fff; font-weight:700; }
+/* Prize text under scratch layer */
+.prize-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 26px;
+  font-weight: bold;
+  color: #2b9a2b;
+}
 
-  h1 { color:#1a4d7a; font-size:24px; margin:8px 0; }
-  p { color:#4b4b4b; font-size:15px; line-height:1.45; margin:8px 0 12px; }
+/* Close button */
+.close-btn {
+  margin-top: 20px;
+  background: #0070d2;
+  padding: 10px 20px;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
 
-  .details-box {
-    background: #f7fbff;
-    border-left: 5px solid var(--brand);
-    padding: 12px;
-    border-radius: 10px;
-    text-align: left;
-    margin-top: 12px;
-    font-size:15px;
-  }
+.close-btn:hover {
+  background: #005bb5;
+}
 
-  .details-box p{ margin:6px 0; }
-
-  .home-btn {
-    display:block;
-    width:100%;
-    padding:12px;
-    margin-top:18px;
-    background:var(--brand);
-    color:#fff;
-    border:none;
-    border-radius:10px;
-    font-weight:700;
-    font-size:15px;
-    cursor:pointer;
-  }
-
-  @media (max-width:420px){
-    .container{ padding:18px; border-radius:12px; }
-    .tick-circle{ width:96px; height:96px; }
-    .tick{ font-size:44px; }
-    h1{ font-size:20px; }
-  }
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding: 50px;
+}
 </style>
 </head>
 
 <body>
-<div class="container" role="region" aria-labelledby="thankTitle">
-  <div class="tick-circle"><div class="tick">✔</div></div>
-  <h1 id="thankTitle">Thank You!</h1>
-  <p>Your warranty has been successfully registered. You will receive updates and support using the details provided.</p>
 
-  <div class="details-box" id="detailsBox">Loading...</div>
+<h1>Thank You!</h1>
+<p>Your response has been submitted successfully.</p>
 
+<!-- Scratch Card Popup -->
+<div id="scratchPopup" class="scratch-popup">
+  <div class="scratch-popup-content">
+    <h2>Congratulations!</h2>
+    <p>Scratch the card to reveal your cash prize 🎉</p>
+
+    <div class="scratch-card-container">
+      <canvas id="scratchCanvas" width="300" height="150"></canvas>
+      <div id="prizeText" class="prize-text">₹<span id="prizeAmount"></span> Cash Prize</div>
+    </div>
+
+    <button onclick="closeScratchPopup()" class="close-btn">Close</button>
+  </div>
 </div>
 
 <script>
-  const params = new URLSearchParams(window.location.search);
-  const name = params.get("name") || '';
-  const product = params.get("product") || '';
-  const code = params.get("code") || '';
+// When page loads → open scratch popup
+window.onload = function () {
+    openScratchPopup();
+};
 
-  const box = document.getElementById('detailsBox');
-  box.innerHTML = `
-    <p><strong>Customer Name:</strong> ${escapeHtml(name)}</p>
-    <p><strong>Product:</strong> ${escapeHtml(product)}</p>
-    <p><strong>Registration Code:</strong> ${escapeHtml(code)}</p>
-  `;
+// Open popup + random prize
+function openScratchPopup() {
+    document.getElementById("scratchPopup").style.display = "flex";
 
-  // small helper to avoid injection via URL params
-  function escapeHtml(str){
-    return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
-  }
+    const prizes = [50, 75, 100, 150, 200, 250, 500];
+    const prize = prizes[Math.floor(Math.random() * prizes.length)];
+    document.getElementById("prizeAmount").innerText = prize;
+
+    initScratchCard();
+}
+
+function closeScratchPopup() {
+    document.getElementById("scratchPopup").style.display = "none";
+}
+
+// Draw scratch layer + erase on touch/mouse
+function initScratchCard() {
+    const canvas = document.getElementById("scratchCanvas");
+    const ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = "#C0C0C0";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    let scratching = false;
+
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: (e.touches ? e.touches[0].clientX : e.clientX) - rect.left,
+            y: (e.touches ? e.touches[0].clientY : e.clientY) - rect.top
+        };
+    }
+
+    function scratch(e) {
+        if (!scratching) return;
+        const pos = getPos(e);
+
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, 20, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    canvas.addEventListener("mousedown", () => scratching = true);
+    canvas.addEventListener("mouseup", () => scratching = false);
+    canvas.addEventListener("mousemove", scratch);
+
+    canvas.addEventListener("touchstart", () => scratching = true);
+    canvas.addEventListener("touchend", () => scratching = false);
+    canvas.addEventListener("touchmove", scratch);
+}
 </script>
+
 </body>
 </html>
