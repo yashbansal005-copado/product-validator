@@ -2,173 +2,276 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<title>Thank You – Warranty Registered</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Thank You</title>
 
 <style>
-/* Popup background */
-.scratch-popup {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.65);
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, Arial;
+    background: linear-gradient(135deg, #e0f7fa, #e8f9ff, #ffffff);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+  }
 
-/* Popup box */
-.scratch-popup-content {
-  background: #fff;
-  padding: 25px;
-  border-radius: 15px;
-  text-align: center;
-  width: 90%;
-  max-width: 380px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.3);
-}
+  .container {
+    background: white;
+    width: 90%;
+    max-width: 500px;
+    padding: 32px;
+    border-radius: 18px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.15);
+    text-align: center;
+    animation: fadeInUp 0.8s ease;
+  }
 
-/* Scratch area container */
-.scratch-card-container {
-  position: relative;
-  width: 300px;
-  margin: auto;
-}
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-/* Prize text under scratch layer (hidden initially) */
-.prize-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 26px;
-  font-weight: bold;
-  color: #2b9a2b;
-  visibility: hidden;
-}
+  .tick-circle {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 20px;
+  }
 
-/* Close button */
-.close-btn {
-  margin-top: 20px;
-  background: #0070d2;
-  padding: 10px 20px;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
+  .tick {
+    font-size: 60px;
+    color: white;
+    font-weight: bold;
+  }
 
-.close-btn:hover {
-  background: #005bb5;
-}
+  h1 {
+    color: #1a4d7a;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
 
-body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  padding: 50px;
-}
+  p {
+    color: #4b4b4b;
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 18px;
+  }
+
+  .details-box {
+    background: #f7fbff;
+    border-left: 5px solid #2b7a78;
+    padding: 14px;
+    border-radius: 10px;
+    text-align: left;
+    margin-top: 20px;
+  }
+
+  .details-box p {
+    margin: 6px 0;
+    font-size: 15px;
+  }
+
+  /* ✨ SCRATCH CARD POPUP */
+  .scratch-popup-bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+  }
+
+  .scratch-popup {
+    background: white;
+    padding: 20px;
+    width: 90%;
+    max-width: 380px;
+    border-radius: 16px;
+    text-align: center;
+    position: relative;
+    touch-action: none;  /* prevents scroll/shake */
+  }
+
+  #scratchCanvas {
+    width: 100%;
+    height: 180px;
+    border-radius: 12px;
+    background: #ccc;
+    margin-top: 15px;
+    touch-action: none; /* prevent screen scrolling */
+  }
+
+  .reward-text {
+    font-size: 26px;
+    font-weight: bold;
+    margin-top: 10px;
+    color: #2b7a78;
+    display: none; /* hidden until fully scratched */
+  }
+
+  .close-btn {
+    margin-top: 15px;
+    background: #2b7a78;
+    padding: 12px 20px;
+    border-radius: 10px;
+    color: white;
+    border: none;
+    width: 100%;
+    font-size: 18px;
+    display: none;
+    cursor: pointer;
+  }
+
 </style>
 </head>
 
 <body>
 
-<h1>Thank You!</h1>
-<p>Your response has been submitted successfully.</p>
+<div class="container">
 
-<!-- Scratch Card Popup -->
-<div id="scratchPopup" class="scratch-popup">
-  <div class="scratch-popup-content">
-    <h2>Congratulations!</h2>
-    <p>Scratch the card to reveal your cash prize 🎉</p>
+  <div class="tick-circle">
+    <div class="tick">✔</div>
+  </div>
 
-    <div class="scratch-card-container">
-      <canvas id="scratchCanvas" width="300" height="150"></canvas>
-      <div id="prizeText" class="prize-text">₹<span id="prizeAmount"></span> Cash Prize</div>
-    </div>
+  <h1>Thank You!</h1>
+  <p>Your warranty has been successfully registered.</p>
 
-    <button onclick="closeScratchPopup()" class="close-btn">Close</button>
+  <div class="details-box" id="detailsBox"></div>
+</div>
+
+<!-- 🎉 SCRATCH CARD POPUP -->
+<div class="scratch-popup-bg" id="popupBG">
+  <div class="scratch-popup">
+    <h2>Scratch & Win! 🎁</h2>
+    <p>Scratch the card below to reveal your reward</p>
+
+    <!-- Hidden reward -->
+    <div id="rewardValue" style="display:none;">₹50 Cashback</div>
+
+    <canvas id="scratchCanvas"></canvas>
+
+    <div class="reward-text" id="rewardText"></div>
+
+    <button class="close-btn" id="closeBtn" onclick="closePopup()">OK</button>
   </div>
 </div>
 
+
 <script>
-// Show popup on load
-window.onload = () => openScratchPopup();
+  /* ------------------------------
+       LOAD URL PARAMS
+  ------------------------------ */
+  const params = new URLSearchParams(window.location.search);
+  const name = params.get("name");
+  const product = params.get("product");
+  const code = params.get("code");
 
-// Open popup + assign random prize
-function openScratchPopup() {
-    document.getElementById("scratchPopup").style.display = "flex";
+  document.getElementById("detailsBox").innerHTML = `
+      <p><b>Customer Name:</b> ${name}</p>
+      <p><b>Product:</b> ${product}</p>
+      <p><b>Registration Code:</b> ${code}</p>
+  `;
 
-    const prizes = [50, 75, 100, 150, 200, 250, 500];
-    const prize = prizes[Math.floor(Math.random() * prizes.length)];
-    document.getElementById("prizeAmount").innerText = prize;
+  /* ------------------------------
+       OPEN SCRATCH CARD POPUP
+  ------------------------------ */
+  window.onload = () => {
+    setTimeout(() => {
+      document.getElementById("popupBG").style.display = "flex";
+      initScratchCard();
+    }, 800);
+  };
 
-    initScratchCard();
-}
 
-function closeScratchPopup() {
-    document.getElementById("scratchPopup").style.display = "none";
-}
-
-function initScratchCard() {
+  /* ------------------------------
+        SCRATCH CARD LOGIC
+  ------------------------------ */
+  function initScratchCard() {
     const canvas = document.getElementById("scratchCanvas");
     const ctx = canvas.getContext("2d");
-    const prizeText = document.getElementById("prizeText");
+    const rewardText = document.getElementById("rewardText");
+    const rewardValue = document.getElementById("rewardValue").innerText;
+    const closeBtn = document.getElementById("closeBtn");
 
-    // Fill with grey scratchable layer
-    ctx.fillStyle = "#C0C0C0";
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+
+    ctx.fillStyle = "#b5b5b5";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     let scratching = false;
 
-    function getPos(e) {
-        const rect = canvas.getBoundingClientRect();
-        return {
-            x: (e.touches ? e.touches[0].clientX : e.clientX) - rect.left,
-            y: (e.touches ? e.touches[0].clientY : e.clientY) - rect.top
-        };
-    }
-
     function scratch(e) {
-        if (!scratching) return;
-        const pos = getPos(e);
+      const rect = canvas.getBoundingClientRect();
+      let x, y;
 
-        ctx.globalCompositeOperation = "destination-out";
-        ctx.beginPath();
-        ctx.arc(pos.x, pos.y, 20, 0, Math.PI * 2);
-        ctx.fill();
+      if (e.touches) {
+        x = e.touches[0].clientX - rect.left;
+        y = e.touches[0].clientY - rect.top;
+      } else {
+        x = e.clientX - rect.left;
+        y = e.clientY - rect.top;
+      }
 
-        checkScratchPercentage();
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.beginPath();
+      ctx.arc(x, y, 25, 0, Math.PI * 2);
+      ctx.fill();
+
+      checkReveal();
     }
 
-    function checkScratchPercentage() {
-        const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    /* Prevent screen shake */
+    canvas.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      scratching = true;
+    });
 
-        let cleared = 0;
-        for (let i = 3; i < pixels.length; i += 4) {
-            if (pixels[i] === 0) cleared++; // alpha = 0 → cleared
-        }
+    canvas.addEventListener("touchend", (e) => {
+      e.preventDefault();
+      scratching = false;
+    });
 
-        const percent = (cleared / (pixels.length / 4)) * 100;
+    canvas.addEventListener("touchmove", (e) => {
+      e.preventDefault();
+      if (scratching) scratch(e);
+    });
 
-        // Reveal prize only after 60% scratched
-        if (percent > 60) {
-            prizeText.style.visibility = "visible";
-        }
-    }
-
-    // Mouse events
     canvas.addEventListener("mousedown", () => scratching = true);
     canvas.addEventListener("mouseup", () => scratching = false);
-    canvas.addEventListener("mousemove", scratch);
+    canvas.addEventListener("mousemove", (e) => { if (scratching) scratch(e); });
 
-    // Touch events
-    canvas.addEventListener("touchstart", () => scratching = true);
-    canvas.addEventListener("touchend", () => scratching = false);
-    canvas.addEventListener("touchmove", scratch);
-}
+
+    function checkReveal() {
+      const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      let cleared = 0;
+
+      for (let i = 3; i < pixels.length; i += 4) {
+        if (pixels[i] === 0) cleared++;
+      }
+
+      const percent = (cleared / (canvas.width * canvas.height)) * 100;
+
+      if (percent > 45) {
+        rewardText.innerText = rewardValue;
+        rewardText.style.display = "block";
+        closeBtn.style.display = "block";
+      }
+    }
+  }
+
+  function closePopup() {
+    document.getElementById("popupBG").style.display = "none";
+  }
 </script>
 
 </body>
