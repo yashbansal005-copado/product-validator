@@ -237,7 +237,7 @@ function initScratchCard() {
       CashReward: selectedReward
     };
 
-    await fetch(`${sheetURL}/Code/${encodeURIComponent(code)}`, {
+    fetch(`${sheetURL}/Code/${encodeURIComponent(code)}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
