@@ -151,14 +151,13 @@ document.getElementById("detailsBox").innerHTML = `
 
 /* Rewards */
 const rewards = [
+  "₹5 Cashback",
   "₹10 Cashback",
+  "₹15 Cashback",
   "₹20 Cashback",
-  "₹50 Cashback",
-  "₹75 Cashback",
-  "₹100 Cashback",
-  "₹150 Gift Voucher",
-  "₹200 Gift Card"
-];
+  "₹25 Cashback",
+  "₹30 Cashback"
+  ];
 
 const selectedReward = rewards[Math.floor(Math.random() * rewards.length)];
 document.getElementById("rewardText").innerText = selectedReward;
@@ -181,7 +180,7 @@ function initScratchCard() {
   canvas.width = canvas.offsetWidth;
   canvas.height = canvas.offsetHeight;
 
-  ctx.fillStyle = "#b5b5b5";
+  ctx.fillStyle = "#1e88e5";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   let scratching = false;
