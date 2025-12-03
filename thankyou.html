@@ -220,11 +220,19 @@ function initScratchCard() {
   canvas.width = canvas.offsetWidth;
   canvas.height = canvas.offsetHeight;
 
-  ctx.fillStyle = "#007BFF";
+  const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  gradient.addColorStop(0, "#0d47a1");
+  gradient.addColorStop(0.3, "#1565c0");
+  gradient.addColorStop(0.6, "#1e88e5");
+  gradient.addColorStop(1, "#64b5f6");
+  ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  //ctx.fillStyle = "#007BFF";
+  //ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   let isDrawing = false;
-  const radius = 28;
+  const radius = 26;
 
   function getPos(e) {
     const rect = canvas.getBoundingClientRect();
@@ -245,6 +253,8 @@ function initScratchCard() {
 
     const pos = getPos(e);
     ctx.globalCompositeOperation = "destination-out";
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
     ctx.beginPath();
     ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
     ctx.fill();
