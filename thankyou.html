@@ -36,6 +36,8 @@
     justify-content: center;
     align-items: center;
     margin: 0 auto 20px;
+    color: #fff;
+    font-size: 60px;
   }
 
   h1 {
@@ -71,19 +73,26 @@
   .scratch-area {
     position: relative;
     width: 100%;
-    height: 180px;
+    height: 200px;
     margin-top: 15px;
-    border-radius: 12px;
+    border-radius: 16px;
     overflow: hidden;
-    touch-action: none; /* prevents shaking */
+    touch-action: none;
+    box-shadow: 0 0 20px rgba(0,150,255,0.4);
+    animation: glow 2s infinite ease-in-out;
   }
 
-  /* Prize text */
+  @keyframes glow {
+    0% { box-shadow: 0 0 12px rgba(0,150,255,0.4); }
+    50% { box-shadow: 0 0 28px rgba(0,150,255,0.7); }
+    100% { box-shadow: 0 0 12px rgba(0,150,255,0.4); }
+  }
+
   .reward-inside {
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 32px;
+    font-size: 34px;
     font-weight: bold;
     color: #2b7a78;
     z-index: 1;
@@ -91,16 +100,21 @@
     text-align: center;
   }
 
-  /* Scratch layer */
+  /* Foil Scratch Layer */
   #scratchCanvas {
     position: absolute;
     top: 0; left: 0;
     width: 100%; 
     height: 100%;
-    border-radius: 12px;
-    background: #b5b5b5; /* silver layer */
-    z-index: 2; 
-    touch-action: none; /* prevents scroll shake */
+    border-radius: 16px;
+    z-index: 2;
+    background: repeating-linear-gradient(
+      45deg,
+      #b5b5b5 0px,
+      #cfcfcf 10px,
+      #b5b5b5 20px
+    );
+    touch-action: none;
   }
 
   .close-btn {
@@ -120,7 +134,7 @@
 <body>
 
 <div class="container">
-  <div class="tick-circle"><div class="tick">✔</div></div>
+  <div class="tick-circle">✔</div>
   <h1>Thank You!</h1>
   <p>Your warranty has been successfully registered.</p>
   <div class="details-box" id="detailsBox"></div>
@@ -142,9 +156,11 @@
 
 <script>
 const sheetURL = "https://api.sheetbest.com/sheets/7b843d7a-47a4-406b-9555-28d60b46cd0c";
+
 /* Load params */
 const params = new URLSearchParams(window.location.search);
 const code = params.get("code");
+
 document.getElementById("detailsBox").innerHTML = `
   <p><b>Customer Name:</b> ${params.get("name")}</p>
   <p><b>Product:</b> ${params.get("product")}</p>
@@ -159,21 +175,32 @@ const rewards = [
   "₹20 Cashback",
   "₹25 Cashback",
   "₹30 Cashback"
-  ];
+];
 
-const selectedReward = rewards[Math.floor(Math.random() * rewards.length)];
+let selectedReward = rewards[Math.floor(Math.random() * rewards.length)];
 document.getElementById("rewardText").innerText = selectedReward;
+
+/* Confetti */
+function launchConfetti() {
+  const duration = 1500;
+  const animationEnd = Date.now() + duration;
+
+  (function frame() {
+    confetti({ particleCount: 4, spread: 60 });
+    if (Date.now() < animationEnd) requestAnimationFrame(frame);
+  })();
+}
 
 /* Show popup */
 window.onload = () => {
   setTimeout(() => {
-    document.body.style.overflow = "hidden"; 
+    document.body.style.overflow = "hidden";
     document.getElementById("popupBG").style.display = "flex";
     initScratchCard();
   }, 700);
 };
 
-/* Scratch logic */
+/* Smooth GPay Style Scratch Logic */
 function initScratchCard() {
   const canvas = document.getElementById("scratchCanvas");
   const ctx = canvas.getContext("2d");
@@ -182,38 +209,45 @@ function initScratchCard() {
   canvas.width = canvas.offsetWidth;
   canvas.height = canvas.offsetHeight;
 
-  ctx.fillStyle = "#1e88e5";
+  ctx.fillStyle = "rgba(180,180,180,1)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  let scratching = false;
+  let isDrawing = false;
+  const radius = 28;
 
-  function scratch(e) {
+  function getPos(e) {
     const rect = canvas.getBoundingClientRect();
-    let x, y;
-
     if (e.touches) {
-      x = e.touches[0].clientX - rect.left;
-      y = e.touches[0].clientY - rect.top;
-    } else {
-      x = e.clientX - rect.left;
-      y = e.clientY - rect.top;
+      return {
+        x: e.touches[0].clientX - rect.left,
+        y: e.touches[0].clientY - rect.top
+      };
     }
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+  }
 
+  function draw(e) {
+    if (!isDrawing) return;
+
+    const pos = getPos(e);
     ctx.globalCompositeOperation = "destination-out";
     ctx.beginPath();
-    ctx.arc(x, y, 25, 0, Math.PI * 2);
+    ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
     ctx.fill();
 
     checkReveal();
   }
 
-  canvas.addEventListener("mousedown", () => scratching = true);
-  canvas.addEventListener("mouseup", () => scratching = false);
-  canvas.addEventListener("mousemove", (e) => scratching && scratch(e));
+  canvas.addEventListener("mousedown", () => isDrawing = true);
+  canvas.addEventListener("mouseup", () => isDrawing = false);
+  canvas.addEventListener("mousemove", draw);
 
-  canvas.addEventListener("touchstart", (e) => { scratching = true; e.preventDefault(); });
-  canvas.addEventListener("touchend", () => scratching = false);
-  canvas.addEventListener("touchmove", (e) => { scratching && scratch(e); e.preventDefault(); });
+  canvas.addEventListener("touchstart", (e) => { isDrawing = true; e.preventDefault(); });
+  canvas.addEventListener("touchend", () => isDrawing = false);
+  canvas.addEventListener("touchmove", (e) => { draw(e); e.preventDefault(); });
 
   function checkReveal() {
     const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
@@ -225,24 +259,22 @@ function initScratchCard() {
 
     const percent = (cleared / (canvas.width * canvas.height)) * 100;
 
-    if (percent > 50) {
+    if (percent > 45) {
       canvas.style.pointerEvents = "none";
       canvas.style.opacity = "0";
       closeBtn.style.display = "block";
 
       if (!window.savedReward) {
-      window.savedReward = true;
+        window.savedReward = true;
 
-      const payload = {
-      CashReward: selectedReward
-    };
+        fetch(`${sheetURL}/Code/${encodeURIComponent(code)}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ CashReward: selectedReward })
+        });
+      }
 
-    fetch(`${sheetURL}/Code/${encodeURIComponent(code)}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-  }
+      launchConfetti();
     }
   }
 }
@@ -252,6 +284,6 @@ function closePopup() {
   document.body.style.overflow = "auto";
 }
 </script>
-
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </body>
 </html>
