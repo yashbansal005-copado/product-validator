@@ -1,29 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>Thank You – Warranty Registered</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
-  body {
+  :root {
+    --brand: #2b7a78;
+    --bg1: #e0f7fa;
+    --bg2: #e8f9ff;
+  }
+
+  html, body {
+    height: 100%;
     margin: 0;
+  }
+
+  body {
     font-family: 'Segoe UI', Roboto, Arial;
-    background: linear-gradient(135deg, #e0f7fa, #e8f9ff, #ffffff);
-    height: 100vh;
+    background: linear-gradient(135deg, var(--bg1), var(--bg2), #ffffff);
     display: flex;
     justify-content: center;
     align-items: center;
     overflow-x: hidden;
+    padding: 20px;
+    box-sizing: border-box;
   }
 
   .container {
-    background: white;
-    width: 90%;
-    max-width: 500px;
-    padding: 32px;
+    background: #fff;
+    width: 100%;
+    max-width: 520px;
+    padding: 28px;
     border-radius: 18px;
-    box-shadow: 0 8px 28px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.12);
     text-align: center;
   }
 
@@ -35,7 +46,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 0 auto 20px;
+    margin: 0 auto 18px;
     color: #fff;
     font-size: 60px;
   }
@@ -44,9 +55,20 @@
     color: #1a4d7a;
     font-size: 26px;
     font-weight: 700;
+    margin: 6px 0 8px;
   }
 
-  /* Popup overlay */
+  p { 
+    color: #465a6b; 
+    margin: 6px 0 12px; 
+  }
+
+  .details-box p { 
+    margin: 6px 0; 
+    color: #345; 
+  }
+
+  /* Popup background */
   .scratch-popup-bg {
     position: fixed;
     top: 0; left: 0;
@@ -56,77 +78,80 @@
     justify-content: center;
     align-items: center;
     z-index: 9999;
+    padding: 20px;
+    box-sizing: border-box;
     touch-action: none;
   }
 
   .scratch-popup {
     background: white;
-    padding: 20px;
-    width: 90%;
-    max-width: 380px;
-    border-radius: 16px;
+    padding: 18px;
+    width: 100%;
+    max-width: 420px;
+    border-radius: 14px;
     text-align: center;
     position: relative;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
   }
 
-  /* Scratch Area */
   .scratch-area {
     position: relative;
     width: 100%;
     height: 200px;
-    margin-top: 15px;
-    border-radius: 16px;
+    margin-top: 14px;
+    border-radius: 12px;
     overflow: hidden;
     touch-action: none;
-    box-shadow: 0 0 20px rgba(0,150,255,0.4);
-    animation: glow 2s infinite ease-in-out;
+    box-shadow: 0 6px 16px rgba(0,150,255,0.18);
+    transition: box-shadow 0.25s ease;
   }
 
-  @keyframes glow {
-    0% { box-shadow: 0 0 12px rgba(0,150,255,0.4); }
-    50% { box-shadow: 0 0 28px rgba(0,150,255,0.7); }
-    100% { box-shadow: 0 0 12px rgba(0,150,255,0.4); }
+  .scratch-area.revealed { 
+    box-shadow: 0 12px 40px rgba(0,0,0,0.12); 
+  }
+
+  @media (min-width:900px){
+    .scratch-area{ height:220px; }
+  }
+
+  canvas.prizeCanvas, 
+  canvas.scratchCanvas {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    display: block;
+    border-radius: 12px;
   }
 
   .reward-inside {
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 34px;
-    font-weight: bold;
-    color: #2b7a78;
-    z-index: 1;
+    z-index: 0;
     pointer-events: none;
+    font-weight: 800;
+    color: #05273b;
     text-align: center;
-  }
-
-  /* Foil Scratch Layer */
-  #scratchCanvas {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; 
-    height: 100%;
-    border-radius: 16px;
-    z-index: 2;
-    background: repeating-linear-gradient(
-      45deg,
-      #b5b5b5 0px,
-      #cfcfcf 10px,
-      #b5b5b5 20px
-    );
-    touch-action: none;
+    font-size: 36px;
   }
 
   .close-btn {
-    margin-top: 18px;
-    background: #2b7a78;
+    margin-top: 14px;
+    background: var(--brand);
     padding: 12px;
     width: 100%;
     border-radius: 10px;
     color: #fff;
     border: none;
-    font-size: 18px;
+    font-size: 16px;
+    cursor: pointer;
     display: none;
+  }
+
+  .info-small {
+    font-size: 13px;
+    color: #667;
+    margin-top: 8px;
   }
 </style>
 </head>
@@ -136,154 +161,287 @@
 <div class="container">
   <div class="tick-circle">✔</div>
   <h1>Thank You!</h1>
-  <p>Your details has been successfully registered.</p>
+  <p>Your details have been successfully registered.</p>
   <div class="details-box" id="detailsBox"></div>
 </div>
 
-<!-- Popup -->
+<!-- Scratch Popup -->
 <div class="scratch-popup-bg" id="popupBG">
-  <div class="scratch-popup">
-    <h2>Scratch & Win 🎁</h2>
+  <div class="scratch-popup" role="dialog" aria-modal="true" aria-labelledby="scratchTitle">
+    <h2 id="scratchTitle">Scratch & Win 🎁</h2>
 
-    <div class="scratch-area">
-      <div id="rewardText" class="reward-inside"></div>
-      <canvas id="scratchCanvas"></canvas>
+    <div class="scratch-area" id="scratchArea">
+      <canvas id="prizeCanvas" class="prizeCanvas"></canvas>
+      <canvas id="scratchCanvas" class="scratchCanvas"></canvas>
+      <div id="rewardTextA11y" style="position:absolute;left:-9999px;height:1px;width:1px;overflow:hidden;"></div>
     </div>
 
     <button class="close-btn" id="closeBtn" onclick="closePopup()">OK</button>
+    <div class="info-small" id="popupNote">Scratch the card to reveal your reward</div>
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
+/* ---------------- Configuration ---------------- */
 const sheetURL = "https://api.sheetbest.com/sheets/7b843d7a-47a4-406b-9555-28d60b46cd0c";
+const SCRATCH_FLAG_FIELD = "ScratchStatus";
+const CASH_FIELD = "CashReward";
+const CODE_PARAM = new URLSearchParams(window.location.search).get('code');
 
-/* Load params */
+/* Fill Details */
 const params = new URLSearchParams(window.location.search);
 const code = params.get("code");
 
 document.getElementById("detailsBox").innerHTML = `
-  <p><b>Customer Name:</b> ${params.get("name")}</p>
-  <p><b>Product:</b> ${params.get("product")}</p>
-  <p><b>Registration Code:</b> ${params.get("code")}</p>
+  <p><b>Customer Name:</b> ${params.get("name") || '-'}</p>
+  <p><b>Product:</b> ${params.get("product") || '-'}</p>
+  <p><b>Registration Code:</b> ${code || '-'}</p>
 `;
 
-/* Rewards */
-const rewards = [
-  "₹5 Cashback",
-  "₹10 Cashback",
-  "₹15 Cashback",
-  "₹20 Cashback",
-  "₹25 Cashback",
-  "₹30 Cashback"
-];
-
+/* ---------------- Rewards ---------------- */
+const rewards = ["₹5 Cashback","₹10 Cashback","₹15 Cashback","₹20 Cashback","₹25 Cashback","₹30 Cashback"];
 let selectedReward = rewards[Math.floor(Math.random() * rewards.length)];
-document.getElementById("rewardText").innerText = selectedReward;
+document.getElementById("rewardTextA11y").innerText = selectedReward;
 
-/* Confetti */
+/* ---------------- Local Storage ---------------- */
+function setLocalScratchDone(codeVal, prize) {
+  localStorage.setItem(`scratchDone_${codeVal}`, "true");
+  localStorage.setItem(`scratchPrize_${codeVal}`, prize);
+}
+function getLocalScratchDone(codeVal) {
+  return localStorage.getItem(`scratchDone_${codeVal}`) === "true";
+}
+function getLocalPrize(codeVal) {
+  return localStorage.getItem(`scratchPrize_${codeVal}`);
+}
+
+/* ---------------- SheetBest Helpers ---------------- */
+async function fetchSheetRows() {
+  const res = await fetch(sheetURL);
+  return res.ok ? res.json() : [];
+}
+
+async function getRowByCode(codeVal) {
+  const rows = await fetchSheetRows();
+  return rows.find(r => String(r.Code) === String(codeVal));
+}
+
+async function markScratchedOnSheet(codeVal, prize) {
+  const payload = {
+    [CASH_FIELD]: prize,
+    [SCRATCH_FLAG_FIELD]: "SCRATCHED",
+    ScratchDateTime: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
+  };
+
+  await fetch(`${sheetURL}/Code/${encodeURIComponent(codeVal)}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+}
+
+/* ---------------- Confetti ---------------- */
 function launchConfetti() {
-  const duration = 1500;
-  const animationEnd = Date.now() + duration;
-
-  (function frame() {
-    confetti({ particleCount: 4, spread: 60 });
-    if (Date.now() < animationEnd) requestAnimationFrame(frame);
-  })();
+  confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+  setTimeout(() => confetti({ particleCount: 40, spread: 100, origin: { y: 0.6 } }), 200);
 }
 
-/* Show popup */
-window.onload = () => {
-  setTimeout(() => {
-    document.body.style.overflow = "hidden";
-    document.getElementById("popupBG").style.display = "flex";
-    initScratchCard();
-  }, 700);
-};
+/* ---------------- Canvas Logic ---------------- */
+const popupBG = document.getElementById('popupBG');
+const prizeCanvas = document.getElementById('prizeCanvas');
+const scratchCanvas = document.getElementById('scratchCanvas');
+const closeBtn = document.getElementById('closeBtn');
+const scratchArea = document.getElementById('scratchArea');
 
-/* Smooth GPay Style Scratch Logic */
-function initScratchCard() {
-  const canvas = document.getElementById("scratchCanvas");
-  const ctx = canvas.getContext("2d");
-  const closeBtn = document.getElementById("closeBtn");
+let prizeCtx, scratchCtx;
+let isDrawing = false;
+let lastX = 0, lastY = 0;
+let revealTriggered = false;
+const revealThresholdPercent = 55;
 
-  canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
+function initCanvasSize() {
+  const ratio = window.devicePixelRatio || 1;
+  const w = scratchArea.clientWidth;
+  const h = scratchArea.clientHeight;
 
-  ctx.fillStyle = "#007BFF";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  prizeCanvas.width = w * ratio;
+  prizeCanvas.height = h * ratio;
+  scratchCanvas.width = w * ratio;
+  scratchCanvas.height = h * ratio;
 
-  let isDrawing = false;
-  const radius = 28;
+  prizeCanvas.style.width = scratchCanvas.style.width = w + "px";
+  prizeCanvas.style.height = scratchCanvas.style.height = h + "px";
 
-  function getPos(e) {
-    const rect = canvas.getBoundingClientRect();
-    if (e.touches) {
-      return {
-        x: e.touches[0].clientX - rect.left,
-        y: e.touches[0].clientY - rect.top
-      };
-    }
-    return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    };
+  prizeCtx = prizeCanvas.getContext("2d");
+  scratchCtx = scratchCanvas.getContext("2d");
+
+  prizeCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  scratchCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
+}
+
+function drawPrize(text) {
+  const w = prizeCanvas.width / (window.devicePixelRatio || 1);
+  const h = prizeCanvas.height / (window.devicePixelRatio || 1);
+
+  prizeCtx.clearRect(0,0,w,h);
+  prizeCtx.fillStyle = "#fff";
+  prizeCtx.fillRect(0,0,w,h);
+
+  prizeCtx.fillStyle = "#0b3a4a";
+  prizeCtx.font = `600 ${Math.floor(Math.min(w,h)*0.08)}px 'Segoe UI'`;
+  prizeCtx.textAlign = "center";
+  prizeCtx.textBaseline = "middle";
+  prizeCtx.fillText(text, w/2, h/2);
+}
+
+function drawFoil() {
+  const w = scratchCanvas.width/(window.devicePixelRatio||1);
+  const h = scratchCanvas.height/(window.devicePixelRatio||1);
+
+  scratchCtx.clearRect(0,0,w,h);
+  const g = scratchCtx.createLinearGradient(0,0,w,h);
+  g.addColorStop(0, "#0d47a1");
+  g.addColorStop(0.35, "#1565c0");
+  g.addColorStop(0.7, "#1e88e5");
+  g.addColorStop(1, "#64b5f6");
+
+  scratchCtx.fillStyle = g;
+  scratchCtx.fillRect(0,0,w,h);
+
+  const gloss = scratchCtx.createLinearGradient(0,0,w,0);
+  gloss.addColorStop(0,"rgba(255,255,255,0.18)");
+  gloss.addColorStop(0.5,"rgba(255,255,255,0.03)");
+  gloss.addColorStop(1,"rgba(255,255,255,0.18)");
+  scratchCtx.fillStyle = gloss;
+  scratchCtx.fillRect(0,0,w,h);
+}
+
+function getPointerPos(e) {
+  const rect = scratchCanvas.getBoundingClientRect();
+  const cx = e.touches ? e.touches[0].clientX : e.clientX;
+  const cy = e.touches ? e.touches[0].clientY : e.clientY;
+  return { x: cx - rect.left, y: cy - rect.top };
+}
+
+function scratchLine(x,y) {
+  scratchCtx.globalCompositeOperation = "destination-out";
+  scratchCtx.lineWidth = Math.max(24, scratchCanvas.width * 0.03);
+  scratchCtx.lineCap = "round";
+
+  scratchCtx.beginPath();
+  scratchCtx.moveTo(lastX,lastY);
+  scratchCtx.lineTo(x,y);
+  scratchCtx.stroke();
+}
+
+function percentCleared() {
+  const img = scratchCtx.getImageData(0,0,scratchCanvas.width,scratchCanvas.height);
+  const pixels = img.data;
+  let cleared = 0;
+
+  for (let i=3;i<pixels.length;i+=4) {
+    if (pixels[i] === 0) cleared++;
   }
+  return (cleared / (pixels.length/4)) * 100;
+}
 
-  function draw(e) {
-    if (!isDrawing) return;
+async function finalizeReveal() {
+  if (revealTriggered) return;
+  revealTriggered = true;
 
-    const pos = getPos(e);
-    ctx.globalCompositeOperation = "destination-out";
-    ctx.beginPath();
-    ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
-    ctx.fill();
+  scratchCanvas.style.opacity = "0";
+  closeBtn.style.display = "block";
+  document.getElementById('popupNote').textContent = 'You have won: ' + selectedReward;
 
-    checkReveal();
-  }
+  launchConfetti();
+  setLocalScratchDone(code, selectedReward);
+  markScratchedOnSheet(code, selectedReward);
+}
 
-  canvas.addEventListener("mousedown", () => isDrawing = true);
-  canvas.addEventListener("mouseup", () => isDrawing = false);
-  canvas.addEventListener("mousemove", draw);
+/* Scratch Handlers */
+function startScratch(e) {
+  e.preventDefault();
+  isDrawing = true;
+  const pos = getPointerPos(e);
+  lastX = pos.x; lastY = pos.y;
+}
 
-  canvas.addEventListener("touchstart", (e) => { isDrawing = true; e.preventDefault(); });
-  canvas.addEventListener("touchend", () => isDrawing = false);
-  canvas.addEventListener("touchmove", (e) => { draw(e); e.preventDefault(); });
+function moveScratch(e) {
+  if (!isDrawing) return;
+  e.preventDefault();
 
-  function checkReveal() {
-    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-    let cleared = 0;
+  const pos = getPointerPos(e);
+  scratchLine(pos.x, pos.y);
+  lastX = pos.x; 
+  lastY = pos.y;
 
-    for (let i = 3; i < pixels.length; i += 4) {
-      if (pixels[i] === 0) cleared++;
-    }
-
-    const percent = (cleared / (canvas.width * canvas.height)) * 100;
-
-    if (percent > 45) {
-      canvas.style.pointerEvents = "none";
-      canvas.style.opacity = "0";
-      closeBtn.style.display = "block";
-
-      if (!window.savedReward) {
-        window.savedReward = true;
-
-        fetch(`${sheetURL}/Code/${encodeURIComponent(code)}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ CashReward: selectedReward })
-        });
-      }
-
-      launchConfetti();
-    }
+  if (percentCleared() >= revealThresholdPercent) {
+    finalizeReveal();
   }
 }
+
+function endScratch() {
+  isDrawing = false;
+}
+
+/* ---------------- Show Popup ---------------- */
+async function showAppropriatePopup() {
+  if (!code) {
+    openPopupAndInit();
+    return;
+  }
+
+  if (getLocalScratchDone(code)) {
+    selectedReward = getLocalPrize(code);
+    openPopupAndShowRevealed(selectedReward);
+    return;
+  }
+
+  const row = await getRowByCode(code);
+  if (row && row[SCRATCH_FLAG_FIELD] === "SCRATCHED") {
+    selectedReward = row[CASH_FIELD];
+    setLocalScratchDone(code, selectedReward);
+    openPopupAndShowRevealed(selectedReward);
+    return;
+  }
+
+  openPopupAndInit();
+}
+
+function openPopupAndShowRevealed(prize) {
+  popupBG.style.display = "flex";
+  initCanvasSize();
+  drawPrize(prize);
+  drawFoil();
+
+  scratchCanvas.style.opacity = "0";
+  closeBtn.style.display = "block";
+  document.getElementById("popupNote").textContent = "Prize already claimed: " + prize;
+}
+
+function openPopupAndInit() {
+  popupBG.style.display = "flex";
+  initCanvasSize();
+  drawPrize(selectedReward);
+  drawFoil();
+
+  scratchCanvas.addEventListener("mousedown", startScratch);
+  scratchCanvas.addEventListener("mousemove", moveScratch);
+  document.addEventListener("mouseup", endScratch);
+
+  scratchCanvas.addEventListener("touchstart", startScratch, { passive: false });
+  scratchCanvas.addEventListener("touchmove", moveScratch, { passive: false });
+  scratchCanvas.addEventListener("touchend", endScratch, { passive: false });
+}
+
+window.addEventListener("load", () => {
+  setTimeout(showAppropriatePopup, 600);
+});
 
 function closePopup() {
-  document.getElementById("popupBG").style.display = "none";
-  document.body.style.overflow = "auto";
+  popupBG.style.display = "none";
 }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </body>
 </html>
