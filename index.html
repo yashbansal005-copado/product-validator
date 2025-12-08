@@ -131,14 +131,28 @@
 
       try {
         const response = await fetch(`${sheetURL}/search?Code=${encodeURIComponent(userInput)}`);
-        const data = await response.json();
-        const match = data[0];
-        const sheetCode = (match.code ?? match.CodeValue ?? match.codeValue ?? "").toString();
+        const raw = await response.json();
+        //const match = data[0];
+
+        let match = null;
+
+        if (Array.isArray(raw) && raw.length > 0) {
+          match = raw[0];
+        } 
+        else if (raw && typeof raw === "object" && Object.keys(raw).length > 0) {
+          match = raw;
+        }
+
+        const sheetCode = String(
+          match.Code ??
+          match.code ??
+          match.CODE ??
+          match.CodeValue ??
+          match.codevalue ??
+          ""
+        );
         console.log('sheetCode: '+ sheetCode);
-        //console.log('match1: '+ match.Code);
-        console.log('match2: '+ match.code);
-        console.log('match3: '+ match.CodeValue);
-        console.log('match4: '+ match.codeValue);
+        
         
         /*const response = await fetch(sheetURL);
         const data = await response.json();
