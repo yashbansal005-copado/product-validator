@@ -133,12 +133,12 @@
         const response = await fetch(`${sheetURL}/search?Code=${encodeURIComponent(userInput)}`);
         const data = await response.json();
         const match = data[0];
-        console.log('match: '+ match );
+        console.log('match: '+ JSON.stringify(match));
         /*const response = await fetch(sheetURL);
         const data = await response.json();
         const match = data.find(row => row.Code?.toLowerCase() === userInput.toLowerCase());*/
 
-        if (match?.toLowerCase() !== userInput.toLowerCase()) {
+        if (match.toLowerCase() !== userInput.toLowerCase()) {
           resultDiv.innerHTML = `<span style="color:red">❌ Invalid code</span>`;
           return;
         }
