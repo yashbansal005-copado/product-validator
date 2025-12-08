@@ -150,7 +150,7 @@
         const data = await response.json();
         const match = data.find(row => row.Code?.toLowerCase() === userInput.toLowerCase());*/
 
-        if (match.toLowerCase() !== normalizedInput.toLowerCase()) {
+        if (match.Code.toLowerCase() !== normalizedInput.toLowerCase()) {
           resultDiv.innerHTML = `<span style="color:red">❌ Invalid code</span>`;
           return;
         }
