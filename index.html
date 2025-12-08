@@ -129,8 +129,10 @@
 
       resultDiv.textContent = "Checking...";
 
+      const normalizedInput = userInput.trim().toUpperCase();
+
       try {
-        const response = await fetch(`${sheetURL}/search?Code=${encodeURIComponent(userInput)}`);
+        const response = await fetch(`${sheetURL}/search?Code=${encodeURIComponent(normalizedInput)}`);
         const raw = await response.json();
         //const match = data[0];
 
@@ -142,7 +144,8 @@
         else if (raw && typeof raw === "object" && Object.keys(raw).length > 0) {
           match = raw;
         }
-
+         console.log('match: '+match);
+        console.log('match: '+match.Code);
         const sheetCode = String(
           match.Code ??
           match.code ??
