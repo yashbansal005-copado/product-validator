@@ -133,7 +133,12 @@
         const response = await fetch(`${sheetURL}/search?Code=${encodeURIComponent(userInput)}`);
         const data = await response.json();
         const match = data[0];
-        console.log('match: '+ JSON.stringify(match));
+        console.log('match1: '+ match.Code);
+        console.log('match2: '+ match.code);
+        console.log('match3: '+ match.CodeValue);
+        console.log('match4: '+ match.codeValue);
+        const sheetCode = (match.Code ?? match.code ?? match.CodeValue ?? match.codeValue ?? "").toString();
+        console.log('sheetCode: '+ sheetCode);
         /*const response = await fetch(sheetURL);
         const data = await response.json();
         const match = data.find(row => row.Code?.toLowerCase() === userInput.toLowerCase());*/
