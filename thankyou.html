@@ -380,7 +380,7 @@ async function finalizeReveal() {
   launchConfetti();
 
   // set local
-  setLocalScratchDone(code, selectedReward);
+  //setLocalScratchDone(code, selectedReward);
 
   // save to sheetbest
   const payload = {};
@@ -423,12 +423,12 @@ async function showAppropriatePopup() {
   if (!code) { openPopupAndInit(); return; }
 
   // 1) local quick check
-  if (getLocalScratchDone(code)) {
+  /*if (getLocalScratchDone(code)) {
     const prize = getLocalPrize(code) || selectedReward;
     selectedReward = prize;
     openPopupAlreadyClaimed(prize);
     return;
-  }
+  }*/
 
   // 2) server check
   try {
@@ -437,7 +437,7 @@ async function showAppropriatePopup() {
       const prize = row[CASH_FIELD] || selectedReward;
       selectedReward = prize;
       // store local for instant future loads
-      setLocalScratchDone(code, prize);
+      //setLocalScratchDone(code, prize);
       openPopupAlreadyClaimed(prize);
       return;
     }
