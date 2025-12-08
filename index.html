@@ -138,7 +138,7 @@
         const data = await response.json();
         const match = data.find(row => row.Code?.toLowerCase() === userInput.toLowerCase());*/
 
-        if (!match || match.Code?.toLowerCase() !== userInput.toLowerCase()) {
+        if (match.Code?.toLowerCase() !== userInput.toLowerCase()) {
           resultDiv.innerHTML = `<span style="color:red">❌ Invalid code</span>`;
           return;
         }
