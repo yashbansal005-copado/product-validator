@@ -144,24 +144,13 @@
         else if (raw && typeof raw === "object" && Object.keys(raw).length > 0) {
           match = raw;
         }
-         console.log('match: '+match);
-        console.log('match: '+match.Code);
-        const sheetCode = String(
-          match.Code ??
-          match.code ??
-          match.CODE ??
-          match.CodeValue ??
-          match.codevalue ??
-          ""
-        );
-        console.log('sheetCode: '+ sheetCode);
         
         
         /*const response = await fetch(sheetURL);
         const data = await response.json();
         const match = data.find(row => row.Code?.toLowerCase() === userInput.toLowerCase());*/
 
-        if (match.toLowerCase() !== userInput.toLowerCase()) {
+        if (match.toLowerCase() !== normalizedInput.toLowerCase()) {
           resultDiv.innerHTML = `<span style="color:red">❌ Invalid code</span>`;
           return;
         }
@@ -172,7 +161,7 @@
         }
 
         // mark scanned with datetime
-        await fetch(`${sheetURL}/Code/${encodeURIComponent(userInput)}`, {
+        await fetch(`${sheetURL}/Code/${encodeURIComponent(normalizedInput)}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -182,7 +171,7 @@
         });
 
         // redirect to details page with encoded URI component
-        window.location.href = `details.html?code=${encodeURIComponent(userInput)}`;
+        window.location.href = `details.html?code=${encodeURIComponent(normalizedInput)}`;
       } catch (err) {
         console.error(err);
         resultDiv.innerHTML = `<span style="color:red">⚠️ Error fetching data</span>`;
