@@ -130,11 +130,13 @@
       resultDiv.textContent = "Checking...";
 
       try {
-        const response = await fetch(sheetURL);
+        const response = await fetch(`${sheetURL}/search?Code=${encodeURIComponent(userInput)}`);
         const data = await response.json();
-
-        //const match = data.find(row => row.Code === userInput);
-        const match = data.find(row => row.Code?.toLowerCase() === userInput.toLowerCase());
+        const match = data[0];
+        
+        /*const response = await fetch(sheetURL);
+        const data = await response.json();
+        const match = data.find(row => row.Code?.toLowerCase() === userInput.toLowerCase());*/
 
         if (!match) {
           resultDiv.innerHTML = `<span style="color:red">❌ Invalid code</span>`;
