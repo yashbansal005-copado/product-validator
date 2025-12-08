@@ -290,7 +290,7 @@ function drawPrize(prizeText) {
   prizeCtx.fillRect(0,0,w,h);
 
   prizeCtx.fillStyle = "#05273b";
-  prizeCtx.font = `600 ${Math.floor(Math.min(w, h) * 0.11)}px 'Segoe UI', Arial`;
+  prizeCtx.font = `600 ${Math.floor(Math.min(w, h) * 0.15)}px 'Segoe UI', Arial`;
   prizeCtx.textAlign = "center";
   prizeCtx.textBaseline = "middle";
 
@@ -372,7 +372,7 @@ async function finalizeReveal() {
   scratchCanvas.style.transition = 'opacity 400ms ease';
   scratchCanvas.style.opacity = '0';
   closeBtn.style.display = 'block';
-  popupNote.textContent = 'You have won: ' + selectedReward;
+  popupNote.textContent = '';
   prizeMessageEl.style.display = 'block';
   prizeMessageEl.textContent = 'You won: ' + selectedReward;
 
@@ -463,7 +463,7 @@ function openPopupAlreadyClaimed(prize) {
   // show message immediately
   prizeMessageEl.style.display = 'block';
   prizeMessageEl.textContent = 'Prize already claimed: ' + prize;
-  popupNote.textContent = 'This reward was already claimed.';
+  popupNote.textContent = '';
   closeBtn.style.display = 'block';
 }
 
