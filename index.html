@@ -102,7 +102,8 @@
   </div>
 
   <script>
-    const sheetURL = "https://api.sheetbest.com/sheets/7b843d7a-47a4-406b-9555-28d60b46cd0c";
+    const API_URL = "https://asia-south1-track-and-trace-prod.cloudfunctions.net/validateCode";
+
     let enc = "";
     window.addEventListener('load', () => {
       const params = new URLSearchParams(window.location.search);
@@ -121,60 +122,58 @@
         return;
       }
 
-      //if (userInput !== enc) {
+      if (!userInput) {
+        resultDiv.innerHTML =
+          `<span style="color:red">⚠️ Please enter the product code.</span>`;
+        return;
+      }
+
       if (userInput.toLowerCase() !== enc.toLowerCase()) {
         resultDiv.innerHTML = `<span style="color:red">❌ Code mismatch. Please check and try again.</span>`;
         return;
       }
+      
 
       resultDiv.textContent = "Checking...";
 
-      const normalizedInput = userInput.trim().toUpperCase();
+      //const normalizedInput = userInput.trim().toUpperCase();
 
       try {
-        const response = await fetch(`${sheetURL}/search?Code=${encodeURIComponent(normalizedInput)}`);
-        const raw = await response.json();
-        //const match = data[0];
 
-        let match = null;
-
-        if (Array.isArray(raw) && raw.length > 0) {
-          match = raw[0];
-        } 
-        else if (raw && typeof raw === "object" && Object.keys(raw).length > 0) {
-          match = raw;
-        }
-        
-        
-        /*const response = await fetch(sheetURL);
-        const data = await response.json();
-        const match = data.find(row => row.Code?.toLowerCase() === userInput.toLowerCase());*/
-
-        if (match.Code.toLowerCase() !== normalizedInput.toLowerCase()) {
-          resultDiv.innerHTML = `<span style="color:red">❌ Invalid code</span>`;
-          return;
-        }
-
-        if (match.Scan && String(match.Scan).toLowerCase() === "scanned") {
-          resultDiv.innerHTML = `<span style="color:red">⚠️ This product has already been scanned on ${match.ScanDateTime || 'N/A'}</span>`;
-          return;
-        }
-
-        // mark scanned with datetime
-        await fetch(`${sheetURL}/Code/${encodeURIComponent(normalizedInput)}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
           body: JSON.stringify({
-            Scan: "Scanned",
-            ScanDateTime: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
+            qrHash: enc,
+            enteredCode: userInput
           })
         });
 
-        // redirect to details page with encoded URI component
-        window.location.href = `details.html?code=${encodeURIComponent(normalizedInput)}`;
-      } catch (err) {
-        console.error(err);
-        resultDiv.innerHTML = `<span style="color:red">⚠️ Error fetching data</span>`;
+        const data = await response.json();
+
+        if (data.status === "VALID") {
+          window.location.href =
+            `details.html?code=${encodeURIComponent(userInput)}`;
+
+        } else if (data.status === "ALREADY_USED") {
+          resultDiv.innerHTML =
+            `<span style="color:red">⚠️ This product has already been scanned.</span>`;
+
+        } else if (data.status === "CODE_MISMATCH") {
+          resultDiv.innerHTML =
+            `<span style="color:red">❌ Invalid code.</span>`;
+
+        } else {
+          resultDiv.innerHTML =
+            `<span style="color:red">❌ Invalid or unknown product.</span>`;
+        }
+
+      } catch (error) {
+        console.error(error);
+        resultDiv.innerHTML =
+          `<span style="color:red">⚠️ Server error. Please try again later.</span>`;
       }
     }
   </script>
