@@ -105,44 +105,27 @@
     const API_URL = "https://asia-south1-track-and-trace-native.cloudfunctions.net/validateCode";
 
     let enc = "";
+    
     window.addEventListener("load", () => {
     const params = new URLSearchParams(window.location.search);
     enc = params.get("enc");
-
-    if (!enc) {
+    /*if (!enc) {
       document.getElementById("result").innerHTML =
         "<span style='color:red'>❌ Invalid or missing QR code.</span>";
-    }
+    }*/
   });
     
     async function validateCode(){
-      alert("Validate button clicked");
-      //const userInput = document.getElementById("manualCode").value.trim();
+      //alert("Validate button clicked");
+
       const enteredCode = document.getElementById("manualCode").value.trim();
       const resultDiv = document.getElementById("result");
-      //const enteredCode = codeInput.value.trim();
-      resultDiv.textContent = "";
-
-      if (!enc) {
-        resultDiv.innerHTML = `<span style="color:red">⚠️ No scanned code found. Please scan QR.</span>`;
-        return;
+      if (!enc || !enteredCode) {
+          resultDiv.innerHTML = "❌ Missing code or QR";
+          return;
       }
-
-      if (!enteredCode) {
-        resultDiv.innerHTML =
-          `<span style="color:red">⚠️ Please enter the product code.</span>`;
-        return;
-      }
-
-      /*if (userInput.toLowerCase() !== enc.toLowerCase()) {
-        resultDiv.innerHTML = `<span style="color:red">❌ Code mismatch. Please check and try again.</span>`;
-        return;
-      }*/
       
-
-      resultDiv.textContent = "Checking...";
-
-      //const normalizedInput = userInput.trim().toUpperCase();
+      resultDiv.innerHTML = "🔄 Verifying…";
 
       try {
 
@@ -159,18 +142,18 @@
 
         const data = await response.json();
 
-
-        if (response.ok && data.valid === true) {
-        resultDiv.innerHTML =
-          "<span style='color:green'>✅ Product verified successfully.</span>";
-
-        // Optional redirect
-        // window.location.href = `details.html?code=${encodeURIComponent(enteredCode)}`;
-      } else {
-        resultDiv.innerHTML =
-          `<span style='color:red'>❌ ${data.error || "Verification failed"}</span>`;
-      }
-        
+        if (data.status === "VALID") {
+      resultDiv.innerHTML = "✅ Product Verified Successfully";
+    } else if (data.status === "ALREADY_USED") {
+      resultDiv.innerHTML = "⚠️ Product already verified earlier";
+    } else if (data.status === "ALREADY_USED_DIFFERENT_DEVICE") {
+      resultDiv.innerHTML = "🚨 Possible duplicate / fraud detected";
+    } else if (data.status === "DISABLED") {
+      resultDiv.innerHTML = "❌ Product disabled by manufacturer";
+    } else {
+      resultDiv.innerHTML = "❌ Invalid product";
+    }
+   
       } catch (error) {
         console.error(error);
         resultDiv.innerHTML =
