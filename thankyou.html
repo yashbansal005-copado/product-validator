@@ -123,7 +123,7 @@ canvas{
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-<script>
+<!--<script>
 /* =======================
    PARAMS
 ======================= */
@@ -255,7 +255,74 @@ function closePopup(){
 }
 
 setTimeout(openPopup,600);
-</script>
+</script>-->
+
+  <script>
+  
+  const params = new URLSearchParams(location.search);
+const enc = params.get("enc");
+const name = params.get("name");
+const phone = params.get("phone");
+
+document.getElementById("detailsBox").innerHTML = `
+  <p><b>Name:</b> ${name}</p>
+  <p><b>Phone:</b> ${phone}</p>
+  <p><b>Product Code:</b> ${enc}</p>
+`;
+
+let selectedReward = null;
+let revealed = false;
+
+async function openPopup(){
+  const res = await fetch(
+    `https://asia-south1-track-and-trace-native.cloudfunctions.net/checkClaim?enc=${enc}`
+  );
+  const data = await res.json();
+
+  popupBG.style.display="flex";
+  initCanvas();
+
+  if (data.scratched) {
+    revealed = true;
+    selectedReward = data.prize;
+    drawPrize();
+    scratchCanvas.style.display="none";
+    prizeMessage.innerText = "Already claimed: " + selectedReward;
+    prizeMessage.style.display = "block";
+    closeBtn.style.display = "block";
+  }
+}
+
+async function finalize(){
+  if (revealed) return;
+  revealed = true;
+
+  await fetch(
+    "https://asia-south1-track-and-trace-native.cloudfunctions.net/saveCustomerClaim",
+    {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ enc, name, phone })
+    }
+  );
+
+  const res = await fetch(
+    `https://asia-south1-track-and-trace-native.cloudfunctions.net/checkClaim?enc=${enc}`
+  );
+  const data = await res.json();
+  selectedReward = data.prize;
+
+  scratchCanvas.style.opacity=0;
+  prizeMessage.innerText = "You won: " + selectedReward;
+  prizeMessage.style.display = "block";
+  closeBtn.style.display = "block";
+  confetti();
+}
+
+setTimeout(openPopup, 600);
+
+    
+  </script>
 
 </body>
 </html>
