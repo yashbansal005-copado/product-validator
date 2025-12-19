@@ -67,6 +67,11 @@
       margin-top: 14px;
     }
 
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
     #result {
       margin-top: 12px;
       text-align: center;
@@ -109,10 +114,6 @@
     window.addEventListener("load", () => {
     const params = new URLSearchParams(window.location.search);
     enc = params.get("enc");
-    /*if (!enc) {
-      document.getElementById("result").innerHTML =
-        "<span style='color:red'>❌ Invalid or missing QR code.</span>";
-    }*/
   });
     
     async function validateCode(){
@@ -120,11 +121,13 @@
 
       const enteredCode = document.getElementById("manualCode").value.trim();
       const resultDiv = document.getElementById("result");
+      const btn = document.getElementById("validateBtn");
+      
       if (!enc || !enteredCode) {
           resultDiv.innerHTML = "❌ Missing code or QR";
           return;
       }
-      
+      btn.disabled = true;
       resultDiv.innerHTML = "🔄 Verifying…";
 
       try {
@@ -144,6 +147,15 @@
 
         if (data.status === "VALID") {
       resultDiv.innerHTML = "✅ Product Verified Successfully";
+      setTimeout(() => {
+          const params = new URLSearchParams({
+            enc: enc,
+            code: enteredCode
+          });
+
+          window.location.href = `details.html?${params.toString()}`;
+        }, 900);
+          
     } else if (data.status === "ALREADY_USED") {
       resultDiv.innerHTML = "⚠️ Product already verified earlier";
     } else if (data.status === "ALREADY_USED_DIFFERENT_DEVICE") {
@@ -158,6 +170,7 @@
         console.error(error);
         resultDiv.innerHTML =
           `<span style="color:red">⚠️ Server error. Please try again later.</span>`;
+        btn.disabled = false;
       }
     }
   </script>
