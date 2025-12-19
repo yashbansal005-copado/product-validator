@@ -236,7 +236,8 @@ async function saveCustomer(){
   );
 
   window.location.href =
-    `thankyou.html?name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&code=${encodeURIComponent(enc)}`;
+  `thankyou.html?enc=${encodeURIComponent(enc)}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`;
+
 }
 </script>
 </body>
