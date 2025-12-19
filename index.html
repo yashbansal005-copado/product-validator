@@ -102,20 +102,25 @@
   </div>
 
   <script>
-    const API_URL = "https://asia-south1-track-and-trace-prod.cloudfunctions.net/validateCode";
+    const API_URL = "https://asia-south1-track-and-trace-native.cloudfunctions.net/validateCode";
 
     let enc = "";
-    window.addEventListener('load', () => {
-      const params = new URLSearchParams(window.location.search);
-      enc = params.get("enc");
-      // improve keyboard UX on mobile: focus manual input if no enc
-      if (!enc) document.getElementById("manualCode").focus();
-    });
+    window.addEventListener("load", () => {
+    const params = new URLSearchParams(window.location.search);
+    enc = params.get("enc");
 
+    if (!enc) {
+      document.getElementById("result").innerHTML =
+        "<span style='color:red'>❌ Invalid or missing QR code.</span>";
+    }
+  });
+    
     async function validateCode(){
       alert("Validate button clicked");
-      const userInput = document.getElementById("manualCode").value.trim();
+      //const userInput = document.getElementById("manualCode").value.trim();
+      const codeInput = document.getElementById("manualCode").value.trim();
       const resultDiv = document.getElementById("result");
+      const enteredCode = codeInput.value.trim();
       resultDiv.textContent = "";
 
       if (!enc) {
@@ -123,7 +128,7 @@
         return;
       }
 
-      if (!userInput) {
+      if (!enteredCode) {
         resultDiv.innerHTML =
           `<span style="color:red">⚠️ Please enter the product code.</span>`;
         return;
@@ -147,32 +152,25 @@
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            qrHash: enc,
-            enteredCode: userInput
+            enc: enc,
+            code: enteredCode
           })
         });
 
         const data = await response.json();
 
-        console.log('data: '+ JSON.stringify(data));
 
-        if (data.status === "VALID") {
-          window.location.href =
-            `details.html?code=${encodeURIComponent(userInput)}`;
+        if (response.ok && data.valid === true) {
+        resultDiv.innerHTML =
+          "<span style='color:green'>✅ Product verified successfully.</span>";
 
-        } else if (data.status === "ALREADY_USED") {
-          resultDiv.innerHTML =
-            `<span style="color:red">⚠️ This product has already been scanned.</span>`;
-
-        } else if (data.status === "CODE_MISMATCH") {
-          resultDiv.innerHTML =
-            `<span style="color:red">❌ Invalid code.</span>`;
-
-        } else {
-          resultDiv.innerHTML =
-            `<span style="color:red">❌ Invalid or unknown product.</span>`;
-        }
-
+        // Optional redirect
+        // window.location.href = `details.html?code=${encodeURIComponent(enteredCode)}`;
+      } else {
+        resultDiv.innerHTML =
+          `<span style='color:red'>❌ ${data.error || "Verification failed"}</span>`;
+      }
+        
       } catch (error) {
         console.error(error);
         resultDiv.innerHTML =
