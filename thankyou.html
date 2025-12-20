@@ -222,16 +222,22 @@ function scratch(e){
    REVEAL CHECK
 ======================= */
 function checkReveal(){
-  const img = scratchCtx.getImageData(
-    0, 0, scratchCanvas.width, scratchCanvas.height
-  ).data;
+  if (revealed) return;
+  const w = scratchCanvas.offsetWidth;
+  const h = scratchCanvas.offsetHeight;
+  
+  const imageData = scratchCtx.getImageData(0, 0, w, h).data;
 
   let cleared = 0;
-  for (let i = 3; i < img.length; i += 4) {
-    if (img[i] === 0) cleared++;
+  const total = imageData.length / 4;
+
+  for (let i = 3; i < imageData.length; i += 4) {
+    if (imageData[i] === 0) cleared++;
   }
 
-  if (cleared / (img.length / 4) > 0.45) {
+  const percent = cleared / total;
+
+  if (percent >= 0.45) {
     finalizeScratch();
   }
 }
