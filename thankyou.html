@@ -69,11 +69,16 @@ body{
   margin-top:14px;
   border-radius:12px;
   overflow:hidden;
+  touch-action: none;
 }
 
 canvas{
-  position:absolute; inset:0;
-  width:100%; height:100%;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;     
+  user-select: none;
 }
 
 .prize-message{
@@ -274,7 +279,7 @@ async function openPopup(){
 
   //selectedReward = data.prize;
   selectedReward = data.prize || REWARDS[Math.floor(Math.random() * REWARDS.length)];
-
+  document.body.style.overflow = "hidden";
   popupBG.style.display = "flex";
   initCanvas();
 
@@ -300,6 +305,7 @@ scratchCanvas.addEventListener("touchmove", scratch, { passive: false });
 
 function closePopup(){
   popupBG.style.display = "none";
+  document.body.style.overflow = 'auto';
 }
 
 setTimeout(openPopup, 600);
