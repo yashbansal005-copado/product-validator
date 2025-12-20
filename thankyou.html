@@ -1,215 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Thank You – Warranty Registered</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<title>Scratch & Win</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-:root{
-  --brand:#2b7a78;
-  --bg1:#e0f7fa;
-  --bg2:#e8f9ff;
-}
-html,body{height:100%;margin:0;}
 body{
-  font-family:'Segoe UI',Roboto,Arial;
-  background:linear-gradient(135deg,var(--bg1),var(--bg2),#fff);
+  margin:0;
+  font-family:Segoe UI,Arial;
+  background:#e8f9ff;
   display:flex;
   justify-content:center;
   align-items:center;
-  padding:20px;
+  height:100vh;
 }
-
-.container{
+.popup{
   background:#fff;
-  max-width:520px;
-  width:100%;
-  padding:28px;
-  border-radius:18px;
-  box-shadow:0 10px 40px rgba(0,0,0,0.12);
-  text-align:center;
-}
-
-.tick-circle{
-  width:120px;height:120px;
-  background:linear-gradient(135deg,#2ecc71,#27ae60);
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  margin:0 auto 18px;
-  color:#fff;font-size:60px;
-}
-
-.details-box p{margin:6px 0;color:#345}
-
-/* Popup */
-.scratch-popup-bg{
-  position:fixed; inset:0;
-  background:rgba(0,0,0,0.6);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:9999;
-  touch-action:none;
-}
-
-.scratch-popup{
-  background:#fff;
-  width:100%;
+  width:90%;
   max-width:420px;
-  padding:18px;
+  padding:16px;
   border-radius:14px;
   text-align:center;
 }
-
 .scratch-area{
   position:relative;
   width:100%;
   height:200px;
-  margin-top:14px;
+  margin-top:16px;
   border-radius:12px;
   overflow:hidden;
   touch-action:none;
 }
-
 canvas{
-  position:absolute; inset:0;
-  width:100%; height:100%;
-  border-radius:12px;
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
 }
-
-.prize-message{
-  margin-top:12px;
-  font-weight:700;
-  display:none;
-}
-
-.close-btn{
-  display:none;
-  margin-top:14px;
-  background:var(--brand);
-  color:#fff;
-  border:none;
+button{
+  margin-top:16px;
   padding:12px;
   width:100%;
+  border:none;
   border-radius:10px;
+  background:#2b7a78;
+  color:#fff;
   font-size:16px;
+  display:none;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-  <div class="tick-circle">✔</div>
-  <h1>Thank You!</h1>
-  <p>Your details have been registered successfully.</p>
-  <div class="details-box" id="detailsBox"></div>
-</div>
-
-<!-- SCRATCH POPUP -->
-<div class="scratch-popup-bg" id="popupBG">
-  <div class="scratch-popup">
-    <h2>Scratch & Win 🎁</h2>
-
-    <div class="scratch-area" id="scratchArea">
-      <canvas id="prizeCanvas"></canvas>
-      <canvas id="scratchCanvas"></canvas>
-    </div>
-
-    <div class="prize-message" id="prizeMessage"></div>
-    <button class="close-btn" id="closeBtn" onclick="closePopup()">OK</button>
+<div class="popup">
+  <h2>Scratch & Win 🎁</h2>
+  <div class="scratch-area">
+    <canvas id="prize"></canvas>
+    <canvas id="scratch"></canvas>
   </div>
+  <div id="msg" style="margin-top:12px;font-weight:700;display:none"></div>
+  <button id="ok" onclick="close()">OK</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
 <script>
-/* =======================
-   PARAMS
-======================= */
 const params = new URLSearchParams(location.search);
 const enc = params.get("enc");
 
-document.getElementById("detailsBox").innerHTML = `
-  <p><b>Product Code:</b> ${enc || "-"}</p>
-`;
+const prizeCanvas = document.getElementById("prize");
+const scratchCanvas = document.getElementById("scratch");
+const pCtx = prizeCanvas.getContext("2d");
+const sCtx = scratchCanvas.getContext("2d");
+const msg = document.getElementById("msg");
+const ok = document.getElementById("ok");
 
-/* =======================
-   CANVAS + SCRATCH (VERSION 1 – UNCHANGED)
-======================= */
-const popupBG = document.getElementById("popupBG");
-const prizeCanvas = document.getElementById("prizeCanvas");
-const scratchCanvas = document.getElementById("scratchCanvas");
-const prizeCtx = prizeCanvas.getContext("2d");
-const scratchCtx = scratchCanvas.getContext("2d");
-const prizeMessage = document.getElementById("prizeMessage");
-const closeBtn = document.getElementById("closeBtn");
-
-let isDrawing = false;
+let drawing = false;
+let revealed = false;
 let lastX = 0, lastY = 0;
-let revealTriggered = false;
-let selectedReward = null;
 
-function initCanvasSize() {
-  const ratio = window.devicePixelRatio || 1;
+function init(){
+  const r = window.devicePixelRatio || 1;
   const w = scratchCanvas.clientWidth;
   const h = scratchCanvas.clientHeight;
 
-  [prizeCanvas, scratchCanvas].forEach(c => {
-    c.width = w * ratio;
-    c.height = h * ratio;
-    c.style.width = w + "px";
-    c.style.height = h + "px";
-    c.getContext("2d").setTransform(ratio,0,0,ratio,0,0);
+  [prizeCanvas, scratchCanvas].forEach(c=>{
+    c.width = w*r;
+    c.height = h*r;
+    c.getContext("2d").setTransform(r,0,0,r,0,0);
   });
+
+  pCtx.fillStyle="#fff";
+  pCtx.fillRect(0,0,w,h);
+
+  sCtx.fillStyle="#b0b0b0";
+  sCtx.fillRect(0,0,w,h);
+  sCtx.globalCompositeOperation="destination-out";
 }
 
-function drawPrize(text){
-  const w = prizeCanvas.clientWidth;
-  const h = prizeCanvas.clientHeight;
-  prizeCtx.clearRect(0,0,w,h);
-  prizeCtx.fillStyle="#fff";
-  prizeCtx.fillRect(0,0,w,h);
-  prizeCtx.fillStyle="#0b3a4a";
-  prizeCtx.font="700 28px Segoe UI";
-  prizeCtx.textAlign="center";
-  prizeCtx.textBaseline="middle";
-  prizeCtx.fillText(text, w/2, h/2);
+function getPos(e){
+  const r = scratchCanvas.getBoundingClientRect();
+  return {
+    x:(e.touches?e.touches[0].clientX:e.clientX)-r.left,
+    y:(e.touches?e.touches[0].clientY:e.clientY)-r.top
+  };
 }
 
-function drawFoil(){
-  scratchCtx.globalCompositeOperation="source-over";
-  scratchCtx.fillStyle="#b0b0b0";
-  scratchCtx.fillRect(0,0,scratchCanvas.width,scratchCanvas.height);
-  scratchCtx.globalCompositeOperation="destination-out";
+function start(e){
+  e.preventDefault();
+  drawing=true;
+  const p=getPos(e);
+  lastX=p.x; lastY=p.y;
 }
 
-function scratchLine(x,y){
-  scratchCtx.lineWidth = 26;
-  scratchCtx.lineCap = 'round';
-  scratchCtx.beginPath();
-  scratchCtx.moveTo(lastX,lastY);
-  scratchCtx.lineTo(x,y);
-  scratchCtx.stroke();
+function move(e){
+  if(!drawing || revealed) return;
+  e.preventDefault();
+  const p=getPos(e);
+  sCtx.lineWidth=26;
+  sCtx.lineCap="round";
+  sCtx.beginPath();
+  sCtx.moveTo(lastX,lastY);
+  sCtx.lineTo(p.x,p.y);
+  sCtx.stroke();
+  lastX=p.x; lastY=p.y;
 }
 
-function percentCleared(){
-  const img = scratchCtx.getImageData(
-    0,0,scratchCanvas.width,scratchCanvas.height
-  ).data;
-  let cleared = 0;
-  for(let i=3;i<img.length;i+=4){
-    if(img[i]===0) cleared++;
-  }
-  return cleared/(img.length/4);
-}
-
-async function finalizeReveal(){
-  if(revealTriggered) return;
-  revealTriggered = true;
+async function end(){
+  if(!drawing || revealed) return;
+  drawing=false;
+  revealed=true;
 
   const res = await fetch(
     "https://asia-south1-track-and-trace-native.cloudfunctions.net/saveCustomerClaim",
@@ -220,47 +141,19 @@ async function finalizeReveal(){
     }
   );
   const data = await res.json();
-  selectedReward = data.prize;
 
-  drawPrize(selectedReward);
-  scratchCanvas.style.opacity = "0";
-  prizeMessage.innerText = "You won: " + selectedReward;
-  prizeMessage.style.display = "block";
-  closeBtn.style.display = "block";
+  pCtx.fillStyle="#0b3a4a";
+  pCtx.font="700 28px Segoe UI";
+  pCtx.textAlign="center";
+  pCtx.textBaseline="middle";
+  pCtx.fillText(data.prize, prizeCanvas.width/2, prizeCanvas.height/2);
+
+  scratchCanvas.style.opacity=0;
+  msg.textContent="You won: "+data.prize;
+  msg.style.display="block";
+  ok.style.display="block";
   confetti();
 }
-
-/* =======================
-   EVENTS
-======================= */
-function getPos(e){
-  const r = scratchCanvas.getBoundingClientRect();
-  if(e.touches){
-    return {
-      x:e.touches[0].clientX-r.left,
-      y:e.touches[0].clientY-r.top
-    };
-  }
-  return { x:e.clientX-r.left, y:e.clientY-r.top };
-}
-
-function start(e){
-  e.preventDefault();
-  isDrawing = true;
-  const p = getPos(e);
-  lastX = p.x; lastY = p.y;
-}
-
-function move(e){
-  if(!isDrawing || revealTriggered) return;
-  e.preventDefault();
-  const p = getPos(e);
-  scratchLine(p.x,p.y);
-  lastX = p.x; lastY = p.y;
-  if(percentCleared() > 0.45) finalizeReveal();
-}
-
-function end(){ isDrawing=false; }
 
 scratchCanvas.addEventListener("mousedown",start);
 scratchCanvas.addEventListener("mousemove",move);
@@ -270,35 +163,29 @@ scratchCanvas.addEventListener("touchstart",start,{passive:false});
 scratchCanvas.addEventListener("touchmove",move,{passive:false});
 scratchCanvas.addEventListener("touchend",end);
 
-/* =======================
-   OPEN POPUP
-======================= */
-async function openPopup(){
+async function check(){
   const res = await fetch(
     `https://asia-south1-track-and-trace-native.cloudfunctions.net/checkClaim?enc=${enc}`
   );
   const data = await res.json();
-
-  popupBG.style.display="flex";
-  initCanvasSize();
-
   if(data.scratched){
-    drawPrize(data.prize);
+    revealed=true;
+    pCtx.fillStyle="#0b3a4a";
+    pCtx.font="700 28px Segoe UI";
+    pCtx.textAlign="center";
+    pCtx.textBaseline="middle";
+    pCtx.fillText(data.prize, prizeCanvas.width/2, prizeCanvas.height/2);
     scratchCanvas.style.display="none";
-    prizeMessage.innerText="Already claimed: "+data.prize;
-    prizeMessage.style.display="block";
-    closeBtn.style.display="block";
-  }else{
-    drawFoil();
+    msg.textContent="Already claimed: "+data.prize;
+    msg.style.display="block";
+    ok.style.display="block";
   }
 }
 
-function closePopup(){
-  popupBG.style.display="none";
-}
+function close(){}
 
-setTimeout(openPopup,600);
+init();
+check();
 </script>
-
 </body>
 </html>
