@@ -157,23 +157,26 @@ let selectedReward = null;
 /* =======================
    CANVAS SETUP
 ======================= */
-function initCanvas(){
+
+  function initCanvas(){
   const ratio = window.devicePixelRatio || 1;
-  const w = scratchCanvas.offsetWidth;
-  const h = scratchCanvas.offsetHeight;
+  const w = scratchCanvas.clientWidth;
+  const h = scratchCanvas.clientHeight;
 
   [prizeCanvas, scratchCanvas].forEach(c => {
     c.width = w * ratio;
     c.height = h * ratio;
+    c.style.width = w + "px";
+    c.style.height = h + "px";
     const ctx = c.getContext("2d");
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.scale(ratio, ratio);
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
   });
 
-  //drawPrize();
   drawFoil();
 }
 
+  
+  
 /* =======================
    DRAW PRIZE
 ======================= */
@@ -205,44 +208,55 @@ function drawFoil(){
 /* =======================
    SCRATCH HANDLER
 ======================= */
-function scratch(e){
-  if (!drawing) return;
+let lastX = 0, lastY = 0;
+
+function scratch(e) {
+  if (!drawing || revealed) return;
 
   const rect = scratchCanvas.getBoundingClientRect();
   const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
   const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
 
+  scratchCtx.globalCompositeOperation = 'destination-out';
+  scratchCtx.lineWidth = Math.max(24, scratchCanvas.width / (window.devicePixelRatio || 1) * 0.03);
+  scratchCtx.lineCap = 'round';
+  scratchCtx.lineJoin = 'round';
+
   scratchCtx.beginPath();
-  scratchCtx.arc(x, y, 22, 0, Math.PI * 2);
-  scratchCtx.fill();
+  scratchCtx.moveTo(lastX || x, lastY || y);
+  scratchCtx.lineTo(x, y);
+  scratchCtx.stroke();
+
+  lastX = x;
+  lastY = y;
 
   checkReveal();
 }
+
 
 /* =======================
    REVEAL CHECK
 ======================= */
 function checkReveal(){
   if (revealed) return;
-  const w = scratchCanvas.offsetWidth;
-  const h = scratchCanvas.offsetHeight;
-  
-  const imageData = scratchCtx.getImageData(0, 0, w, h).data;
+
+  const img = scratchCtx.getImageData(
+    0, 0,
+    scratchCanvas.width,
+    scratchCanvas.height
+  ).data;
 
   let cleared = 0;
-  const total = imageData.length / 4;
-
-  for (let i = 3; i < imageData.length; i += 4) {
-    if (imageData[i] === 0) cleared++;
+  for (let i = 3; i < img.length; i += 4) {
+    if (img[i] === 0) cleared++;
   }
 
-  const percent = cleared / total;
-
-  if (percent >= 0.45) {
+  if (cleared / (img.length / 4) > 0.45) {
     finalizeScratch();
   }
 }
 
+  
 /* =======================
    FINALIZE SCRATCH
 ======================= */
@@ -305,11 +319,18 @@ async function openPopup(){
 /* =======================
    EVENTS
 ======================= */
-scratchCanvas.addEventListener("mousedown", () => drawing = true);
+scratchCanvas.addEventListener("mousedown", (e) => {
+  drawing = true;
+  lastX = lastY = 0;
+});
 scratchCanvas.addEventListener("mouseup", () => drawing = false);
 scratchCanvas.addEventListener("mousemove", scratch);
 
-scratchCanvas.addEventListener("touchstart", () => drawing = true, { passive: false });
+scratchCanvas.addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  drawing = true;
+  lastX = lastY = 0;
+}, { passive: false });
 scratchCanvas.addEventListener("touchend", () => drawing = false);
 scratchCanvas.addEventListener("touchmove", scratch, { passive: false });
 
