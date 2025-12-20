@@ -178,17 +178,20 @@ function initCanvas(){
    DRAW PRIZE
 ======================= */
 function drawPrize(){
-  prizeCtx.clearRect(0, 0, prizeCanvas.width, prizeCanvas.height);
+  const w = prizeCanvas.offsetWidth;
+  const h = prizeCanvas.offsetHeight;
+  
+  prizeCtx.clearRect(0, 0, w, h);
   prizeCtx.fillStyle = "#ffffff";
-  prizeCtx.fillRect(0, 0, prizeCanvas.width, prizeCanvas.height);
+  prizeCtx.fillRect(0, 0, w, h);
   prizeCtx.fillStyle = "#0b3a4a";
   prizeCtx.font = "700 28px Segoe UI";
   prizeCtx.textAlign = "center";
   prizeCtx.textBaseline = "middle";
   prizeCtx.fillText(
     selectedReward || "",
-    prizeCanvas.width / 2,
-    prizeCanvas.height / 2
+    w / 2,
+    h / 2
   );
 }
 
