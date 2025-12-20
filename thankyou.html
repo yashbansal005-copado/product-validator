@@ -249,6 +249,7 @@ function checkReveal(){
    FINALIZE SCRATCH
 ======================= */
 async function finalizeScratch(){
+  alert("finalizeScratch called1");
   if (revealed) return;
   revealed = true;
 
@@ -257,7 +258,7 @@ async function finalizeScratch(){
   prizeMessage.style.display = "block";
   closeBtn.style.display = "block";
   confetti();
-
+alert("finalizeScratch called2");
   await fetch(
     "https://asia-south1-track-and-trace-native.cloudfunctions.net/saveCustomerClaim",
     {
