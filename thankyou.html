@@ -205,7 +205,7 @@ function drawFoil(){
    SCRATCH HANDLER
 ======================= */
 function scratch(e){
-  if (!drawing || revealed) return;
+  if (!drawing) return;
 
   const rect = scratchCanvas.getBoundingClientRect();
   const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
@@ -242,7 +242,9 @@ function checkReveal(){
 async function finalizeScratch(){
   if (revealed) return;
   revealed = true;
-
+  
+  scratchCanvas.style.pointerEvents = "none";
+  
   const res = await fetch(
     "https://asia-south1-track-and-trace-native.cloudfunctions.net/saveCustomerClaim",
     {
