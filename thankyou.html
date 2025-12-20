@@ -260,6 +260,11 @@ async function finalizeScratch(){
     }
   );
 
+  if (!res.ok) {
+  console.error("Scratch save failed");
+  return;
+}
+
   const data = await res.json();
   selectedReward = data.prize;
   
