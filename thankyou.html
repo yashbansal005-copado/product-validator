@@ -72,6 +72,7 @@ body{
 }
 
 canvas{
+  touch-action: none;
   position:absolute; inset:0;
   width:100%; height:100%;
 }
@@ -423,12 +424,33 @@ async function finalize(){
 /* =======================
    EVENTS
 ======================= */
-scratchCanvas.addEventListener("mousedown",()=>drawing=true);
-scratchCanvas.addEventListener("mouseup",()=>drawing=false);
-scratchCanvas.addEventListener("mousemove",scratch);
-scratchCanvas.addEventListener("touchstart",()=>drawing=true,{passive:false});
-scratchCanvas.addEventListener("touchend",()=>drawing=false);
-scratchCanvas.addEventListener("touchmove",scratch,{passive:false});
+scratchCanvas.addEventListener("mousedown", (e) => {
+  e.preventDefault();
+  drawing = true;
+});
+
+scratchCanvas.addEventListener("mousemove", scratch);
+
+scratchCanvas.addEventListener("mouseup", () => {
+  drawing = false;
+});
+
+scratchCanvas.addEventListener("mouseleave", () => {
+  drawing = false;
+});
+
+scratchCanvas.addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  drawing = true;
+}, { passive: false });
+scratchCanvas.addEventListener("touchmove", (e) => {
+  e.preventDefault();
+  scratch(e);
+}, { passive: false });
+
+scratchCanvas.addEventListener("touchend", () => {
+  drawing = false;
+});
 
 async function openPopup(){
   popupBG.style.display="flex";
