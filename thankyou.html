@@ -146,8 +146,6 @@ const prizeCanvas = document.getElementById("prizeCanvas");
 const scratchCanvas = document.getElementById("scratchCanvas");
 const prizeCtx = prizeCanvas.getContext("2d");
 const scratchCtx = scratchCanvas.getContext("2d");
-const prizeMessage = document.getElementById("prizeMessage");
-const closeBtn = document.getElementById("closeBtn");
 
 let drawing = false;
 let revealed = false;
@@ -164,31 +162,29 @@ function initCanvas(){
   [prizeCanvas, scratchCanvas].forEach(c => {
     c.width = w * ratio;
     c.height = h * ratio;
-    const ctx = c.getContext("2d");
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.scale(ratio, ratio);
+    c.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
   });
 
-  //drawPrize();
+  drawPrize();
   drawFoil();
 }
 
 /* =======================
    DRAW PRIZE
 ======================= */
-function drawPrize(text) {
-  const w = prizeCanvas.offsetWidth;
-  const h = prizeCanvas.offsetHeight;
-
-  prizeCtx.clearRect(0, 0, w, h);
+function drawPrize(){
+  prizeCtx.clearRect(0, 0, prizeCanvas.width, prizeCanvas.height);
   prizeCtx.fillStyle = "#ffffff";
-  prizeCtx.fillRect(0, 0, w, h);
-
+  prizeCtx.fillRect(0, 0, prizeCanvas.width, prizeCanvas.height);
   prizeCtx.fillStyle = "#0b3a4a";
   prizeCtx.font = "700 28px Segoe UI";
   prizeCtx.textAlign = "center";
   prizeCtx.textBaseline = "middle";
-  prizeCtx.fillText(text, w / 2, h / 2);
+  prizeCtx.fillText(
+    selectedReward || "",
+    prizeCanvas.width / 2,
+    prizeCanvas.height / 2
+  );
 }
 
 /* =======================
@@ -243,25 +239,20 @@ async function finalizeScratch(){
   if (revealed) return;
   revealed = true;
 
-  const res = await fetch(
-    "https://asia-south1-track-and-trace-native.cloudfunctions.net/saveCustomerClaim",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ enc })
-    }
-  );
-
-  const data = await res.json();
-  selectedReward = data.prize;
-  
-  drawPrize(selectedReward);
   scratchCanvas.style.opacity = 0;
-  
   prizeMessage.innerText = "You won: " + selectedReward;
   prizeMessage.style.display = "block";
   closeBtn.style.display = "block";
   confetti();
+
+  await fetch(
+    "https://asia-south1-track-and-trace-native.cloudfunctions.net/saveCustomerClaim",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ enc, name, phone })
+    }
+  );
 }
 
 /* =======================
@@ -272,15 +263,14 @@ async function openPopup(){
     `https://asia-south1-track-and-trace-native.cloudfunctions.net/checkClaim?enc=${enc}`
   );
   const data = await res.json();
-  
+
+  selectedReward = data.prize;
+
   popupBG.style.display = "flex";
   initCanvas();
-  
+
   if (data.scratched) {
-    selectedReward = data.prize;
     revealed = true;
-    //initCanvas();
-    drawPrize(selectedReward);
     scratchCanvas.style.display = "none";
     prizeMessage.innerText = "Already claimed: " + selectedReward;
     prizeMessage.style.display = "block";
