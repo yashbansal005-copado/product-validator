@@ -138,6 +138,9 @@ document.getElementById("detailsBox").innerHTML = `
   <p><b>Product Code:</b> ${enc || "-"}</p>
 `;
 
+  const REWARDS = ["₹5 Cashback","₹10 Cashback","₹15 Cashback","₹20 Cashback","₹25 Cashback"];
+
+
 /* =======================
    CANVAS ELEMENTS
 ======================= */
@@ -146,6 +149,8 @@ const prizeCanvas = document.getElementById("prizeCanvas");
 const scratchCanvas = document.getElementById("scratchCanvas");
 const prizeCtx = prizeCanvas.getContext("2d");
 const scratchCtx = scratchCanvas.getContext("2d");
+const prizeMessage = document.getElementById("prizeMessage");
+const closeBtn = document.getElementById("closeBtn");
 
 let drawing = false;
 let revealed = false;
@@ -250,7 +255,7 @@ async function finalizeScratch(){
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ enc, name, phone })
+      body: JSON.stringify({ enc })
     }
   );
 }
@@ -264,7 +269,8 @@ async function openPopup(){
   );
   const data = await res.json();
 
-  selectedReward = data.prize;
+  //selectedReward = data.prize;
+  selectedReward = data.prize || REWARDS[Math.floor(Math.random() * REWARDS.length)];
 
   popupBG.style.display = "flex";
   initCanvas();
