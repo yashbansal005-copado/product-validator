@@ -190,6 +190,8 @@ button{
 <script>
 const params = new URLSearchParams(location.search);
 const enc = params.get("enc");
+const originalCode = params.get("code");
+alert('enc and originalCode' + enc + '::' + originalCode);
 let productName = "";
 let actualCode = "";
 //loadProduct();
@@ -205,7 +207,7 @@ async function loadProduct(){
       }
     );
     const data = await res.json();
-
+    alert('data: ' + JSON.stringify(data));
     productName = data.product;
     actualCode = data.code;
 
