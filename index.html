@@ -124,10 +124,10 @@
       const btn = document.getElementById("validateBtn");
       
       if (!enc || !enteredCode) {
-          resultDiv.innerHTML = "❌ Missing code or QR";
+          resultDiv.innerHTML = "❌ Missing code";
           return;
       }
-      btn.disabled = true;
+      //btn.disabled = true;
       resultDiv.innerHTML = "🔄 Verifying…";
 
       try {
@@ -146,6 +146,7 @@
         const data = await response.json();
 
         if (data.status === "VALID") {
+          btn.disabled = true;
       resultDiv.innerHTML = "✅ Product Verified Successfully";
       setTimeout(() => {
           const params = new URLSearchParams({
@@ -163,7 +164,7 @@
     } else if (data.status === "DISABLED") {
       resultDiv.innerHTML = "❌ Product disabled by manufacturer";
     } else {
-      resultDiv.innerHTML = "❌ Invalid product";
+      resultDiv.innerHTML = "❌ Code mismatch. Please check and try again";
     }
    
       } catch (error) {
