@@ -191,10 +191,10 @@ button{
 const params = new URLSearchParams(location.search);
 const enc = params.get("enc");
 const originalCode = params.get("code");
-alert('enc and originalCode' + enc + '::' + originalCode);
+//alert('enc and originalCode' + enc + '::' + originalCode);
 let productName = "";
 let actualCode = "";
-//loadProduct();
+loadProduct();
 async function loadProduct(){
   const info = document.getElementById("info");
   try{
@@ -293,7 +293,7 @@ async function saveCustomer(){
   );
 
   window.location.href =
-  `thankyou.html?enc=${encodeURIComponent(enc)}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`;
+  `thankyou.html?enc=${encodeURIComponent(enc)}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&originalCode=${encodeURIComponent(originalCode)}`;
 
 }
 </script>
