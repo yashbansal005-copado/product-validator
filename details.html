@@ -166,11 +166,12 @@ button{
   <h3>Claim Your Prize</h3>
 
   <label>Name</label>
-  <input id="custName" placeholder="Full name">
+  <input id="custName" placeholder="Enter your full name">
 
   <label>Phone Number</label>
-  <input id="custPhone" maxlength="10"
-    oninput="this.value=this.value.replace(/\D/g,'')">
+  <input id="custPhone" maxlength="10" placeholder="Enter your phone number"
+    oninput="this.value=this.value.replace(/\D/g,''); clearPhoneError();">
+  <div id="phoneError" style="color:red; font-size:14px; margin-top:6px;"></div>
 
   <button onclick="saveCustomer()">Save Details</button>
   <div id="status"></div>
@@ -207,6 +208,10 @@ async function loadProduct(){
   }
 }
 
+function clearPhoneError() {
+  document.getElementById("phoneError").textContent = "";
+}
+
 function toggleAccordion(el){
   const acc = el.parentElement;
   document.querySelectorAll(".accordion").forEach(a=>{
@@ -220,9 +225,19 @@ async function saveCustomer(){
   const phone = custPhone.value.trim();
   const status = document.getElementById("status");
 
-  if(!name || phone.length!==10){
+  /*if(!name || phone.length!==10){
     status.style.color="red";
     status.textContent="Enter valid details";
+    return;
+  }*/
+
+  if(!name || !phone){
+    statusDiv.innerHTML = `<span style="color:#b00020">Please fill all fields</span>`;
+    return;
+  }
+
+  if (!/^[0-9]{10}$/.test(phone)) {
+    document.getElementById("phoneError").textContent = "Enter a valid 10-digit phone number";
     return;
   }
 
