@@ -106,64 +106,70 @@ button{
 </head>
 
 <body>
-<main class="card">
+<main class="card" role="main" aria-labelledby="pageTitle">
+    <div class="success-banner" id="banner">🎉 Congratulations! Your product is genuine and authenticated.</div>
 
-  <div class="success-banner" id="banner">
-    🎉 Congratulations! Your product is genuine and authenticated.
-  </div>
+    <h2 id="pageTitle">Product Authenticity Details</h2>
+    <div id="info" aria-live="polite"></div>
 
-  <h2>Product Authenticity Details</h2>
-  <div id="info"></div>
+  <!-- Accordions -->
+    <div class="accordion" id="acc-warranty">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <h4>Warranty Information</h4><div class="accordion-arrow">▶</div>
+      </div>
+      <div class="accordion-content">
+        <p><b>Type:</b> Limited Manufacturer Warranty</p>
+        <p><b>Duration:</b> 12 Months from purchase date</p>
+        <p>Covers manufacturing defects and quality issues.</p>
+      </div>
+    </div>
 
-  <!-- Accordions (unchanged content) -->
-  <div class="accordion">
-    <div class="accordion-header" onclick="toggleAccordion(this)">
-      <h4>Warranty Information</h4><div class="accordion-arrow">▶</div>
+    <div class="accordion" id="acc-care">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <h4>Care Instructions</h4><div class="accordion-arrow">▶</div>
+      </div>
+      <div class="accordion-content">
+        <p>• Store in a cool, dry place</p>
+        <p>• Clean using a microfiber cloth</p>
+        <p>• Avoid water, chemicals & drops</p>
+        <p>• Do not self-repair or modify</p>
+      </div>
     </div>
-    <div class="accordion-content">
-      <p><b>Type:</b> Limited Manufacturer Warranty</p>
-      <p><b>Duration:</b> 12 Months</p>
-    </div>
-  </div>
 
-  <div class="accordion">
-    <div class="accordion-header" onclick="toggleAccordion(this)">
-      <h4>Care Instructions</h4><div class="accordion-arrow">▶</div>
+    <div class="accordion" id="acc-batch">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <h4>Factory Batch Information</h4><div class="accordion-arrow">▶</div>
+      </div>
+      <div class="accordion-content">
+        <p><b>Inspection Level:</b> 4-step quality check</p>
+        <p><b>QC Engineer:</b> Senior Quality Specialist</p>
+        <p>Batch is certified before packaging.</p>
+      </div>
     </div>
-    <div class="accordion-content">
-      <p>• Store in cool dry place</p>
-      <p>• Avoid water & chemicals</p>
-    </div>
-  </div>
 
-  <div class="accordion">
-    <div class="accordion-header" onclick="toggleAccordion(this)">
-      <h4>Factory Batch Information</h4><div class="accordion-arrow">▶</div>
+    <div class="accordion" id="acc-pack">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <h4>Packaging Authenticity</h4><div class="accordion-arrow">▶</div>
+      </div>
+      <div class="accordion-content">
+        <p>✔ Tamper-proof hologram</p>
+        <p>✔ Encrypted QR token (unclonable)</p>
+        <p>✔ Real-time scan traceability</p>
+      </div>
     </div>
-    <div class="accordion-content">
-      <p>Certified production batch</p>
-    </div>
-  </div>
 
-  <div class="accordion">
-    <div class="accordion-header" onclick="toggleAccordion(this)">
-      <h4>Packaging Authenticity</h4><div class="accordion-arrow">▶</div>
+    <div class="accordion" id="acc-manuf">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <h4>Manufacturer Details</h4><div class="accordion-arrow">▶</div>
+      </div>
+      <div class="accordion-content">
+        <p><b>Company:</b> SF Dynamix Industries Pvt. Ltd.</p>
+        <p><b>HQ:</b> Bengaluru, India</p>
+        <p><b>Plant:</b> Coimbatore, Tamil Nadu (ISO Certified)</p>
+      </div>
     </div>
-    <div class="accordion-content">
-      <p>✔ Tamper-proof QR</p>
-    </div>
-  </div>
 
-  <div class="accordion">
-    <div class="accordion-header" onclick="toggleAccordion(this)">
-      <h4>Manufacturer Details</h4><div class="accordion-arrow">▶</div>
-    </div>
-    <div class="accordion-content">
-      <p>Track & Trace Pvt. Ltd.</p>
-    </div>
-  </div>
-
-  <h3>Claim Your Prize</h3>
+  <h3 style="margin-top:18px">Claim Your Prize after entering the below details..!!</h3>
 
   <label>Name</label>
   <input id="custName" placeholder="Enter your full name"/>
@@ -239,12 +245,15 @@ function clearPhoneError() {
 
 
 
-function toggleAccordion(el){
-  const acc = el.parentElement;
-  document.querySelectorAll(".accordion").forEach(a=>{
-    if(a!==acc) a.classList.remove("open");
+function toggleAccordion(headerEl) {
+  const parent = headerEl.parentElement;
+  const all = document.querySelectorAll('.accordion');
+
+  all.forEach(a => {
+    if (a !== parent) a.classList.remove('open');
   });
-  acc.classList.toggle("open");
+
+  parent.classList.toggle('open');
 }
 
 async function saveCustomer(){
