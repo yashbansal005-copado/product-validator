@@ -136,11 +136,12 @@ const params = new URLSearchParams(location.search);
 const enc = params.get("enc");
 const name = params.get("name");
 const phone = params.get("phone");
+const originalCode = params.get("originalCode");
 
 document.getElementById("detailsBox").innerHTML = `
   <p><b>Name:</b> ${name || "-"}</p>
   <p><b>Phone:</b> ${phone || "-"}</p>
-  <p><b>Product Code:</b> ${enc || "-"}</p>
+  <p><b>Product Code:</b> ${originalCode || "-"}</p>
 `;
 
   const REWARDS = ["₹5 Cashback","₹10 Cashback","₹15 Cashback","₹20 Cashback","₹25 Cashback"];
