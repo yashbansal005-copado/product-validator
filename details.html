@@ -166,12 +166,10 @@ button{
   <h3>Claim Your Prize</h3>
 
   <label>Name</label>
-  <input id="custName" placeholder="Enter your full name"
-    oninput="clearFormError()>
+  <input id="custName" placeholder="Enter your full name"/>
 
   <label>Phone Number</label>
-  <input id="custPhone" maxlength="10" placeholder="Enter your phone number"
-    oninput="this.value=this.value.replace(/\D/g,''); clearPhoneError(); clearFormError();">
+  <input id="custPhone" maxlength="10" placeholder="Enter your phone number"/>
   <div id="phoneError" style="color:red; font-size:14px; margin-top:6px;"></div>
 
   <button onclick="saveCustomer()">Save Details</button>
@@ -209,14 +207,37 @@ async function loadProduct(){
   }
 }
 
-function clearFormError() {
+/*function clearFormError() {
   const status = document.getElementById("status");
   status.textContent = "";
 }
 
 function clearPhoneError() {
   document.getElementById("phoneError").textContent = "";
+}*/
+
+const custName = document.getElementById("custName");
+const custPhone = document.getElementById("custPhone");
+
+custName.addEventListener("input", () => {
+  clearFormError();
+});
+
+custPhone.addEventListener("input", () => {
+  custPhone.value = custPhone.value.replace(/\D/g, "");
+  clearFormError();
+  clearPhoneError();
+});
+
+function clearFormError() {
+  document.getElementById("status").textContent = "";
 }
+
+function clearPhoneError() {
+  document.getElementById("phoneError").textContent = "";
+}
+
+
 
 function toggleAccordion(el){
   const acc = el.parentElement;
