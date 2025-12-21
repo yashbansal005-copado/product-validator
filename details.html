@@ -190,11 +190,12 @@ button{
 <script>
 const params = new URLSearchParams(location.search);
 const enc = params.get("enc");
-const originalCode = params.get("code");
+//const originalCode = params.get("code");
 //alert('enc and originalCode' + enc + '::' + originalCode);
 let scratched = "";
 let prize = "";
 let productName = "";
+let originalCode = "";
 
 loadProduct();
 async function loadProduct(){
@@ -213,6 +214,7 @@ async function loadProduct(){
     scratched = data.scratched;
     prize = data.prize;
     productName = data.productName;
+    originalCode = data.originalCode;
     info.innerHTML =
       `<p><b>Product:</b> ${productName}</p>
        <p><b>Code:</b> ${originalCode}</p>`;
