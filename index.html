@@ -150,8 +150,8 @@
       resultDiv.innerHTML = "✅ Product Verified Successfully";
       setTimeout(() => {
           const params = new URLSearchParams({
-            enc: enc,
-            code: enteredCode
+            enc: enc
+            //code: enteredCode
           });
 
           window.location.href = `details.html?${params.toString()}`;
