@@ -171,7 +171,7 @@ button{
 
   <label>Phone Number</label>
   <input id="custPhone" maxlength="10" placeholder="Enter your phone number"
-    oninput="this.value=this.value.replace(/\D/g,''); clearPhoneError(); clearPhoneError();">
+    oninput="this.value=this.value.replace(/\D/g,''); clearPhoneError(); clearFormError();">
   <div id="phoneError" style="color:red; font-size:14px; margin-top:6px;"></div>
 
   <button onclick="saveCustomer()">Save Details</button>
