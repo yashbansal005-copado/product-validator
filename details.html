@@ -68,6 +68,7 @@ h3{margin-top:18px;color:#264653;font-size:1rem;}
 .accordion-arrow{
   transition:transform .3s ease;
   font-size:18px;
+  color:#0f4c5c;
 }
 .accordion.open .accordion-arrow{transform:rotate(90deg);}
 .accordion-content{
@@ -75,11 +76,14 @@ h3{margin-top:18px;color:#264653;font-size:1rem;}
   overflow:hidden;
   transition:max-height .35s ease,padding .25s ease;
   padding:0 16px;
+  box-sizing:border-box;
 }
 .accordion.open .accordion-content{
   padding:12px 16px 16px;
   max-height:420px;
 }
+
+.accordion-content p{ margin:6px 0; color:#333; line-height:1.45; }
 
 label{display:block;margin-top:12px;font-weight:600;}
 input{
