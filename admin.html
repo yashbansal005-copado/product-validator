@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Dashboard – Track & Trace</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f4f6f9;
+}
+
+header {
+  background: #2b7a78;
+  color: white;
+  padding: 16px 24px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* KPI cards */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: white;
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+.card h3 {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.card p {
+  margin-top: 8px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #2b7a78;
+}
+
+/* Sections */
+.section {
+  margin-top: 32px;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+.section h2 {
+  margin-top: 0;
+  font-size: 18px;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+th, td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+  font-size: 14px;
+}
+
+th {
+  background: #f0f4f6;
+}
+
+/* Button */
+button {
+  background: #2b7a78;
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button:hover {
+  background: #256d6b;
+}
+
+.footer {
+  text-align: center;
+  margin: 30px 0;
+  color: #777;
+  font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  Admin Dashboard – QR Tracking & Rewards
+</header>
+
+<div class="container">
+
+  <!-- KPI CARDS -->
+  <div class="cards">
+    <div class="card">
+      <h3>Total QR Codes</h3>
+      <p id="totalQR">–</p>
+    </div>
+    <div class="card">
+      <h3>Scanned QR Codes</h3>
+      <p id="scannedQR">–</p>
+    </div>
+    <div class="card">
+      <h3>Prizes Claimed</h3>
+      <p id="claimedQR">–</p>
+    </div>
+    <div class="card">
+      <h3>Total Payout</h3>
+      <p id="totalPayout">₹0</p>
+    </div>
+  </div>
+
+  <!-- PRIZE BREAKUP -->
+  <div class="section">
+    <h2>Prize Distribution</h2>
+    <canvas id="prizeChart" height="120"></canvas>
+  </div>
+
+  <!-- BATCH REPORT -->
+  <div class="section">
+    <h2>Batch-wise Report</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Batch ID</th>
+          <th>Total Codes</th>
+          <th>Scanned</th>
+          <th>Prizes Claimed</th>
+        </tr>
+      </thead>
+      <tbody id="batchTable"></tbody>
+    </table>
+  </div>
+
+  <!-- CSV EXPORT -->
+  <div class="section">
+    <h2>Finance Export</h2>
+    <button onclick="downloadCSV()">Download Claims CSV</button>
+  </div>
+
+</div>
+
+<div class="footer">
+  © Track & Trace Admin Dashboard
+</div>
+
+<script>
+/* ============================
+   CONFIG
+============================ */
+const BASE_URL = "https://asia-south1-track-and-trace-native.cloudfunctions.net";
+const ADMIN_KEY = "SUPER_SECRET_ADMIN_KEY"; // 🔐 keep private
+
+/* ============================
+   FETCH HELPERS
+============================ */
+async function adminFetch(endpoint) {
+  const res = await fetch(`${BASE_URL}/${endpoint}`, {
+    headers: { "x-admin-key": ADMIN_KEY }
+  });
+  return res.json();
+}
+
+/* ============================
+   LOAD SUMMARY
+============================ */
+async function loadSummary() {
+  const data = await adminFetch("getAdminSummary");
+
+  totalQR.textContent = data.totalQRCodes;
+  scannedQR.textContent = data.scannedQRCodes;
+  claimedQR.textContent = data.prizesClaimed;
+  totalPayout.textContent = "₹" + data.totalPayout;
+}
+
+/* ============================
+   PRIZE PIE CHART
+============================ */
+async function loadPrizeChart() {
+  const data = await adminFetch("getPrizeBreakup");
+
+  const labels = Object.keys(data);
+  const values = Object.values(data);
+
+  new Chart(document.getElementById("prizeChart"), {
+    type: "pie",
+    data: {
+      labels,
+      datasets: [{
+        data: values
+      }]
+    }
+  });
+}
+
+/* ============================
+   BATCH TABLE
+============================ */
+async function loadBatchReport() {
+  const data = await adminFetch("getBatchReport");
+  const tbody = document.getElementById("batchTable");
+  tbody.innerHTML = "";
+
+  Object.entries(data).forEach(([batchId, stats]) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${batchId}</td>
+      <td>${stats.total}</td>
+      <td>${stats.scanned}</td>
+      <td>${stats.scratched}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ============================
+   CSV EXPORT
+============================ */
+function downloadCSV() {
+  window.open(`${BASE_URL}/exportClaimsCSV?key=${ADMIN_KEY}`, "_blank");
+}
+
+/* ============================
+   INIT
+============================ */
+loadSummary();
+loadPrizeChart();
+loadBatchReport();
+</script>
+
+</body>
+</html>
