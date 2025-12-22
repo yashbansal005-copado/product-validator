@@ -179,14 +179,15 @@ button:hover {
    CONFIG
 ============================ */
 const BASE_URL = "https://asia-south1-track-and-trace-native.cloudfunctions.net";
-const ADMIN_KEY = "SUPER_SECRET_ADMIN_KEY"; // 🔐 keep private
-
+//const ADMIN_KEY = "SUPER_SECRET_ADMIN_KEY"; // 🔐 keep private
+let ADMIN_KEY = sessionStorage.getItem("ADMIN_KEY");
+  
 if (!ADMIN_KEY) {
   ADMIN_KEY = prompt("Enter Admin Key");
 
   if (!ADMIN_KEY) {
     document.body.innerHTML = "<h2>Access Denied</h2>";
-    throw new Error("Admin key not provided");
+    throw new Error("Admin key required");
   }
 
   sessionStorage.setItem("ADMIN_KEY", ADMIN_KEY);
@@ -200,6 +201,10 @@ async function adminFetch(endpoint) {
   const res = await fetch(`${BASE_URL}/${endpoint}`, {
     headers: { "x-admin-key": ADMIN_KEY }
   });
+  
+  if (!res.ok) {
+    throw new Error("Admin API error: " + res.status);
+  }
   return res.json();
 }
 
