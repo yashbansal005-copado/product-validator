@@ -188,6 +188,10 @@ button{
 </main>
 
 <script>
+if (sessionStorage.getItem("FLOW_STEP") !== "DETAILS") {
+  window.location.replace("index.html");
+}
+
 const params = new URLSearchParams(location.search);
 const enc = params.get("enc");
 //const originalCode = params.get("code");
@@ -295,7 +299,8 @@ async function saveCustomer(){
       body:JSON.stringify({enc,name,phone})
     }
   );
-
+  
+  sessionStorage.setItem("FLOW_STEP", "THANKYOU");
   window.location.href =
   `/thankyou/?enc=${encodeURIComponent(enc)}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&originalCode=${encodeURIComponent(originalCode)}`;
 
