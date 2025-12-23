@@ -129,6 +129,11 @@ canvas{
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
+
+if (sessionStorage.getItem("FLOW_STEP") !== "THANKYOU") {
+  window.location.replace("index.html");
+}
+
 /* =======================
    PARAMS
 ======================= */
@@ -311,6 +316,21 @@ function closePopup(){
 }
 
 setTimeout(openPopup, 600);
+
+/* ==========================
+   🔒 BLOCK BACK NAVIGATION
+========================== */
+
+history.replaceState(null, "", location.href);
+
+// Push a fake history state
+history.pushState(null, "", location.href);
+
+// Trap back button
+window.addEventListener("popstate", function () {
+  history.pushState(null, "", location.href);
+});
+  
 </script>
 
 
