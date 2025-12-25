@@ -130,9 +130,9 @@ canvas{
 
 <script>
 
-if (sessionStorage.getItem("FLOW_STEP") !== "THANKYOU") {
+/*if (sessionStorage.getItem("FLOW_STEP") !== "THANKYOU") {
   window.location.replace("../index.html");
-}
+}*/
 
 /* =======================
    PARAMS
@@ -316,21 +316,6 @@ function closePopup(){
 }
 
 setTimeout(openPopup, 600);
-
-/* ==========================
-   🔒 BLOCK BACK NAVIGATION
-========================== */
-
-history.replaceState(null, "", location.href);
-
-// Push a fake history state
-//history.pushState(null, "", location.href);
-
-// Trap back button
-window.addEventListener("popstate", function () {
-  history.go(1);
-  //history.pushState(null, "", location.href);
-});
   
 </script>
 
