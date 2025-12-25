@@ -188,11 +188,11 @@ button{
 </main>
 
 <script>
-if (sessionStorage.getItem("FLOW_STEP") !== "DETAILS") {
+/*if (sessionStorage.getItem("FLOW_STEP") !== "DETAILS") {
   window.location.replace("../index.html");
 }
 sessionStorage.setItem("FLOW_STEP", "THANKYOU");
-window.location.href = "thankyou/index.html" + location.search;
+window.location.href = "thankyou/index.html" + location.search;*/
 
 const params = new URLSearchParams(location.search);
 const enc = params.get("enc");
