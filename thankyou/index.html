@@ -324,11 +324,12 @@ setTimeout(openPopup, 600);
 history.replaceState(null, "", location.href);
 
 // Push a fake history state
-history.pushState(null, "", location.href);
+//history.pushState(null, "", location.href);
 
 // Trap back button
 window.addEventListener("popstate", function () {
-  history.pushState(null, "", location.href);
+  history.go(1);
+  //history.pushState(null, "", location.href);
 });
   
 </script>
