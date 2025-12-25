@@ -189,8 +189,10 @@ button{
 
 <script>
 if (sessionStorage.getItem("FLOW_STEP") !== "DETAILS") {
-  window.location.replace("index.html");
+  window.location.replace("../index.html");
 }
+sessionStorage.setItem("FLOW_STEP", "THANKYOU");
+window.location.href = "thankyou/index.html" + location.search;
 
 const params = new URLSearchParams(location.search);
 const enc = params.get("enc");
@@ -300,7 +302,7 @@ async function saveCustomer(){
     }
   );
   
-  sessionStorage.setItem("FLOW_STEP", "THANKYOU");
+  //sessionStorage.setItem("FLOW_STEP", "THANKYOU");
   window.location.href =
   `/thankyou/?enc=${encodeURIComponent(enc)}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&originalCode=${encodeURIComponent(originalCode)}`;
 
