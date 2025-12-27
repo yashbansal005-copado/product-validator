@@ -307,6 +307,49 @@ async function saveCustomer(){
   `/thankyou/?enc=${encodeURIComponent(enc)}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&originalCode=${encodeURIComponent(originalCode)}`;
 
 }
+
+async function getUserLocation() {
+  // 1️⃣ Try Browser GPS (best)
+  if ("geolocation" in navigator) {
+    try {
+      const pos = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 8000
+        });
+      });
+
+      return {
+        source: "GPS",
+        latitude: pos.coords.latitude,
+        longitude: pos.coords.longitude
+      };
+    } catch (e) {
+      console.warn("GPS denied, fallback to IP");
+    }
+  }
+
+  // 2️⃣ IP fallback (FREE)
+  try {
+    const res = await fetch("https://ipapi.co/json/");
+    const data = await res.json();
+
+    return {
+      source: "IP",
+      city: data.city,
+      region: data.region,
+      postal: data.postal,
+      country: data.country_name,
+      latitude: data.latitude,
+      longitude: data.longitude,
+      ip: data.ip
+    };
+  } catch (e) {
+    console.error("IP location failed");
+    return null;
+  }
+}
+  
 </script>
 </body>
 </html>
