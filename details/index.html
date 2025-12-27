@@ -287,20 +287,25 @@ async function saveCustomer(){
     status.innerHTML = `<span style="color:#b00020">Please fill all fields</span>`;
     return;
   }
+  status.textContent = "Saving...";
 
   if (!/^[0-9]{10}$/.test(phone)) {
     document.getElementById("phoneError").textContent = "Enter a valid 10-digit phone number";
     return;
   }
 
-  await fetch(
+  const location = await getUserLocation();
+
+  const res = await fetch(
     "https://asia-south1-track-and-trace-native.cloudfunctions.net/saveCustomer",
     {
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({enc,name,phone})
+      body:JSON.stringify({enc,name,phone,location})
     }
   );
+
+  const data = await res.json();
   
   //sessionStorage.setItem("FLOW_STEP", "THANKYOU");
   window.location.href =
