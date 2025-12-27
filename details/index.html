@@ -313,8 +313,28 @@ async function saveCustomer(){
 
 }
 
+  async function reverseGeocode(lat, lng) {
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+    );
+    const data = await res.json();
+
+    return {
+      city: data.address.city || data.address.town || data.address.village || null,
+      state: data.address.state || null,
+      postal: data.address.postcode || null,
+      country: data.address.country || null,
+      fullAddress: data.display_name || null
+    };
+  } catch (e) {
+    console.error("Reverse geocode failed", e);
+    return {};
+  }
+}
+
 async function getUserLocation() {
-  // 1️⃣ Try Browser GPS (best)
+  // 1️⃣ GPS first (mobile best)
   if ("geolocation" in navigator) {
     try {
       const pos = await new Promise((resolve, reject) => {
@@ -324,17 +344,24 @@ async function getUserLocation() {
         });
       });
 
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+
+      // 🆕 Reverse geocode GPS
+      const address = await reverseGeocode(lat, lng);
+
       return {
         source: "GPS",
-        latitude: pos.coords.latitude,
-        longitude: pos.coords.longitude
+        latitude: lat,
+        longitude: lng,
+        ...address
       };
     } catch (e) {
       console.warn("GPS denied, fallback to IP");
     }
   }
 
-  // 2️⃣ IP fallback (FREE)
+  // 2️⃣ IP fallback (desktop / denied GPS)
   try {
     const res = await fetch("https://ipapi.co/json/");
     const data = await res.json();
@@ -342,7 +369,7 @@ async function getUserLocation() {
     return {
       source: "IP",
       city: data.city,
-      region: data.region,
+      state: data.region,
       postal: data.postal,
       country: data.country_name,
       latitude: data.latitude,
