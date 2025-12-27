@@ -140,10 +140,31 @@ button:hover {
     </div>
   </div>
 
+  <!-- DAILY TREND -->
+  <div class="section">
+    <h2>Daily Scan Trend</h2>
+    <canvas id="dailyChart" height="120"></canvas>
+  </div>
+
   <!-- PRIZE BREAKUP -->
   <div class="section">
     <h2>Prize Distribution</h2>
     <canvas id="prizeChart" height="120"></canvas>
+  </div>
+
+  <!-- CITY-WISE REPORT -->
+  <div class="section">
+    <h2>City-wise Activity</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>City</th>
+          <th>Scanned</th>
+          <th>Prizes Claimed</th>
+        </tr>
+      </thead>
+      <tbody id="cityTable"></tbody>
+    </table>
   </div>
 
   <!-- BATCH REPORT -->
@@ -220,6 +241,27 @@ async function loadSummary() {
   totalPayout.textContent = "₹" + data.totalPayout;
 }
 
+/* ==========================
+   DAILY TREND (NEW)
+========================== */
+async function loadDailyTrend() {
+  const data = await adminFetch("getDailyTrend");
+
+  new Chart(document.getElementById("dailyChart"), {
+    type: "line",
+    data: {
+      labels: Object.keys(data),
+      datasets: [{
+        label: "Scans",
+        data: Object.values(data),
+        borderColor: "#2b7a78",
+        tension: 0.3,
+        fill: false
+      }]
+    }
+  });
+}
+
 /* ============================
    PRIZE PIE CHART
 ============================ */
@@ -237,6 +279,25 @@ async function loadPrizeChart() {
         data: values
       }]
     }
+  });
+}
+
+/* ==========================
+   CITY-WISE REPORT (NEW)
+========================== */
+async function loadCityReport() {
+  const data = await adminFetch("getCityReport");
+  const tbody = document.getElementById("cityTable");
+  tbody.innerHTML = "";
+
+  Object.entries(data).forEach(([city, stats]) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${city}</td>
+      <td>${stats.scanned}</td>
+      <td>${stats.claimed}</td>
+    `;
+    tbody.appendChild(tr);
   });
 }
 
@@ -271,7 +332,9 @@ function downloadCSV() {
    INIT
 ============================ */
 loadSummary();
+loadDailyTrend();
 loadPrizeChart();
+loadCityReport();
 loadBatchReport();
 </script>
 
