@@ -324,9 +324,39 @@ async function loadBatchReport() {
 /* ============================
    CSV EXPORT
 ============================ */
-function downloadCSV() {
+/*function downloadCSV() {
   window.open(`${BASE_URL}/exportClaimsCSV?key=${ADMIN_KEY}`, "_blank");
+}*/
+
+async function downloadCSV() {
+  try {
+    const res = await fetch(`${BASE_URL}/exportClaimsCSV`, {
+      method: "GET",
+      headers: {
+        "x-admin-key": ADMIN_KEY
+      }
+    });
+
+    if (!res.ok) {
+      alert("Failed to download CSV (status " + res.status + ")");
+      return;
+    }
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "claims.csv";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    console.error(e);
+    alert("Error downloading CSV");
+  }
 }
+
 
 /* ============================
    INIT
